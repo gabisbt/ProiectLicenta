@@ -21,62 +21,62 @@ const PriceAdvisorBot = ({ auctionDetail, currentBid }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  // const handleSendMessage = async () => {
+  //   if (!inputMessage.trim()) return;
     
-    // Add user message to chat
-    setMessages([...messages, { sender: 'user', text: inputMessage }]);
-    const userQuery = inputMessage;
-    setInputMessage('');
-    setIsLoading(true);
+  //   // Add user message to chat
+  //   setMessages([...messages, { sender: 'user', text: inputMessage }]);
+  //   const userQuery = inputMessage;
+  //   setInputMessage('');
+  //   setIsLoading(true);
     
-    try {
-      // Get auth token from localStorage
-      const token = localStorage.getItem('token');
+  //   try {
+  //     // Get auth token from localStorage
+  //     const token = localStorage.getItem('token');
       
-      // Make actual API call to your backend
-      const response = await fetch('/api/price-advisor', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ 
-          query: userQuery,
-          productTitle: auctionDetail.title,
-          productDescription: auctionDetail.description,
-          currentBid: currentBid || auctionDetail.startingBid,
-          condition: auctionDetail.condition || 'Used'
-        }),
-      });
+  //     // Make actual API call to your backend
+  //     const response = await fetch('/api/price-advisor', {
+  //       method: 'POST',
+  //       headers: { 
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${token}`
+  //       },
+  //       body: JSON.stringify({ 
+  //         query: userQuery,
+  //         productTitle: auctionDetail.title,
+  //         productDescription: auctionDetail.description,
+  //         currentBid: currentBid || auctionDetail.startingBid,
+  //         condition: auctionDetail.condition || 'Used'
+  //       }),
+  //     });
       
-      if (!response.ok) {
-        throw new Error('API response error');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('API response error');
+  //     }
       
-      const data = await response.json();
+  //     const data = await response.json();
       
-      if (data.success) {
-        setMessages(prev => [
-          ...prev, 
-          { 
-            sender: 'bot', 
-            text: data.response
-          }
-        ]);
-      } else {
-        throw new Error(data.message || 'Unknown error');
-      }
-    } catch (error) {
-      console.error('Error querying price advisor:', error);
-      setMessages(prev => [...prev, { 
-        sender: 'bot', 
-        text: 'Sorry, I had trouble analyzing prices right now. Please try again later.' 
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (data.success) {
+  //       setMessages(prev => [
+  //         ...prev, 
+  //         { 
+  //           sender: 'bot', 
+  //           text: data.response
+  //         }
+  //       ]);
+  //     } else {
+  //       throw new Error(data.message || 'Unknown error');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error querying price advisor:', error);
+  //     setMessages(prev => [...prev, { 
+  //       sender: 'bot', 
+  //       text: 'Sorry, I had trouble analyzing prices right now. Please try again later.' 
+  //     }]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <>
