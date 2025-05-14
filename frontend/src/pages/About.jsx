@@ -8,7 +8,6 @@ const About = () => {
         setIsLoaded(true);
     }, []);
 
-    // miau
     const values = [
         {
             id: 1,
