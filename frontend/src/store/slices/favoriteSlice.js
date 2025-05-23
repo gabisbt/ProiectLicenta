@@ -63,6 +63,14 @@ export const checkFavorite = createAsyncThunk(
   }
 );
 
+// Adaugă acțiunea de reset
+export const resetFavorites = createAsyncThunk(
+  "favorites/resetFavorites",
+  async (_, { rejectWithValue }) => {
+    return []; // Returnează un array gol
+  }
+);
+
 const favoriteSlice = createSlice({
   name: 'favorites',
   initialState,
@@ -120,6 +128,20 @@ const favoriteSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(checkFavorite.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      
+      // Adaugă un handler pentru resetFavorites
+      .addCase(resetFavorites.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(resetFavorites.fulfilled, (state, action) => {
+        state.favorites = [];
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(resetFavorites.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   }

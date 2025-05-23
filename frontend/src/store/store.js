@@ -5,6 +5,7 @@ import auctionReducer from "./slices/auctionSlice";
 import bidReducer from "./slices/bidSlice";
 import superAdminReducer from "./slices/superAdminSlice";
 import favoriteReducer from "./slices/favoriteSlice";
+import recommendationReducer from "./slices/recommendationSlice";
 // import reviewReducer from "./slices/reviewSlice";
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
         bid: bidReducer,
         superAdmin: superAdminReducer,
         favorites: favoriteReducer,
+        recommendation: recommendationReducer,
         // review: reviewReducer,
     },
 });

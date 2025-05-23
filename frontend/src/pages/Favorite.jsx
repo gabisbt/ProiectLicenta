@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { FaHeart, FaSearch, FaTrash, FaRegCalendarAlt, FaGavel, FaSun, FaMoon } from "react-icons/fa";
+import { FaHeart, FaSearch, FaTrash, FaRegCalendarAlt, FaGavel } from "react-icons/fa";
 import {
   removeFromFavorites,
-  getFavorites
+  getFavorites,
+  resetFavorites // asigură-te că această acțiune există sau adaug-o
 } from "@/store/slices/favoriteSlice";
 import Spinner from "@/custom-components/Spinner";
 import Card from "@/custom-components/Card";
@@ -15,17 +16,19 @@ const Favorites = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredFavorites, setFilteredFavorites] = useState([]);
-  const [isDarkMode, setIsDarkMode] = useState(false); // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const favorites = useSelector((state) => state.favorites?.favorites || []);
   const loading = useSelector((state) => state.favorites?.loading || false);
 
   const favoritesLoaded = useRef(false);
+  const previousUser = useRef(null);
 
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
 
 
+  // Redirecționare pentru utilizatori neautentificați
   useEffect(() => {
     if (!isAuthenticated) {
       navigateTo("/login");
@@ -38,7 +41,21 @@ const Favorites = () => {
     }
   }, [isAuthenticated, user, navigateTo]);
 
+  // Detectează schimbarea utilizatorului și resetează lista de favorite
   useEffect(() => {
+    // Resetează starea favorit-urilor când utilizatorul se schimbă
+    if (previousUser.current && user && previousUser.current._id !== user._id) {
+      console.log("User changed, resetting favorites");
+      dispatch(resetFavorites()); // Acțiune pentru a reseta starea favorit-urilor
+      favoritesLoaded.current = false; // Permite reîncărcarea favorit-urilor
+    }
+    
+    // Salvează utilizatorul curent pentru comparații viitoare
+    if (user) {
+      previousUser.current = user;
+    }
+    
+    // Încarcă favorit-urile pentru utilizatorul curent
     if (isAuthenticated && user?.role === "Bidder" && !favoritesLoaded.current) {
       dispatch(getFavorites());
       favoritesLoaded.current = true;
@@ -166,54 +183,22 @@ const Favorites = () => {
             </div>
 
             {filteredFavorites.length > 0 ? (
-              // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-12">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">  
-              {filteredFavorites.map((auction, index) => (
-                  <div 
-                    key={auction._id || `favorite-${index}`} 
-                    className={`relative group transition-all duration-300 ${
-                      isDarkMode ? 'ring-2 ring-gray-800 shadow-xl rounded-lg' : ''
-                    }`}
-                  >
-                    {/* Card Component */}
-                    <Card
-                      title={auction.title || "Untitled Auction"}
-                      startTime={auction.startTime}
-                      endTime={auction.endTime}
-                      imgSrc={auction.image?.url}
-                      startingBid={auction.startingBid}
-                      id={auction._id}
-                    />
-
-                    {/* Remove Button (appears on hover) */}
-                    <button
-                      onClick={() => handleRemoveFromFavorites(auction._id, auction.title || "Untitled")}
-                      className="absolute top-3 right-3 bg-white/80 hover:bg-white p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 transform hover:scale-110"
-                      title="Remove from favorites"
-                    >
-                      <FaTrash className="text-red-500" />
-                    </button>
-
-                    {/* Status Badge */}
-                    <div className="absolute top-3 left-3">
-                      {isAuctionActive(auction) ? (
-                        <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                          <FaGavel /> Active
-                        </div>
-                      ) : auction.startTime && new Date(auction.startTime) > new Date() ? (
-                        <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                          <FaRegCalendarAlt /> Upcoming
-                        </div>
-                      ) : (
-                        <div className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                          <FaRegCalendarAlt /> Ended
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                {filteredFavorites.map((auction, index) => (
+                  // MODIFICARE AICI: Acum renderăm Card direct în grid, fără div wrapper
+                  <Card
+                    key={auction._id || `favorite-${index}`}
+                    title={auction.title || "Untitled Auction"}
+                    startTime={auction.startTime}
+                    endTime={auction.endTime}
+                    imgSrc={auction.image?.url}
+                    startingBid={auction.startingBid}
+                    id={auction._id}
+                  />
                 ))}
               </div>
             ) : (
+              // Componenta pentru "No favorites found" rămâne neschimbată
               <div className="flex flex-col items-center justify-center py-20 px-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/30 shadow-md">
                 <div className="bg-red-100/50 p-6 rounded-full mb-6">
                   <FaHeart className="text-red-400 text-5xl" />

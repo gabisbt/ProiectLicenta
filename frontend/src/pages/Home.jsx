@@ -5,6 +5,7 @@ import FeaturedAuctions from "./home-sub-components/FeaturedAuctions";
 import UpcomingAuctions from "./home-sub-components/UpcomingAuctions";
 import Leaderboard from "./home-sub-components/Leaderboard";
 import { FaGavel, FaChevronDown } from "react-icons/fa";
+import Recommendations from "@/components/ui/Recommendations";
 
 const Home = () => {
     const { isAuthenticated } = useSelector((state) => state.user);
@@ -182,7 +183,10 @@ const Home = () => {
                         <Leaderboard />
                     </div>
                 </div>
+            {/* <Recommendations /> */}
             </section>
+
+            <Recommendations />
         </>
     );
 };

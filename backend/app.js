@@ -13,6 +13,8 @@ import superAdminRouter from "./router/superAdminRoutes.js";
 import {endedAuctionCron} from "./automation/endedAuctionCron.js";
 import {verifyCommissionCron} from "./automation/verifyCommissionCron.js";
 import favoriteRouter from "./router/favoriteRoutes.js";
+import recommendationRoutes from "./router/recommendationRoutes.js";
+
 // import priceAdvisorRouter from "./router/priceAdvisor.js";
 // const priceAdvisorRoutes = require('./routes/priceAdvisor.js');
 
@@ -45,6 +47,8 @@ app.use("/api/v1/bid", BidRouter);
 app.use("/api/v1/commission", commissionRouter);
 app.use("/api/v1/superadmin", superAdminRouter);
 app.use("/api/v1/favorites", favoriteRouter);
+// Recomandări
+app.use("/api/v1/recommendations", recommendationRoutes);
 // app.use('/api/price-advisor', priceAdvisorRoutes);
 
 endedAuctionCron();
