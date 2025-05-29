@@ -89,3 +89,50 @@ export const checkFavorite = catchAsyncErrors(async (req, res, next) => {
     isFavorite: !!favorite
   });
 });
+
+// Functie pentru curatarea duplicatelor din favorite
+export const cleanupDuplicateFavorites = catchAsyncErrors(async (req, res, next) => {
+    try {
+        console.log("Starting cleanup of duplicate favorites...");
+        
+        // Gaseste toate favoritele
+        const allFavorites = await Favorite.find({});
+        
+        // Grupeaza dupa user si auction
+        const grouped = {};
+        
+        allFavorites.forEach(fav => {
+            const key = `${fav.user}_${fav.auction}`;
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+            grouped[key].push(fav);
+        });
+        
+        let deletedCount = 0;
+        
+        // Pentru fiecare grup, pastreaza doar primul si sterge restul
+        for (const key in grouped) {
+            const duplicates = grouped[key];
+            if (duplicates.length > 1) {
+                // Pastrează primul, sterge restul
+                for (let i = 1; i < duplicates.length; i++) {
+                    await Favorite.findByIdAndDelete(duplicates[i]._id);
+                    deletedCount++;
+                }
+            }
+        }
+        
+        console.log(`Cleanup completed. Deleted ${deletedCount} duplicate favorites.`);
+        
+        res.status(200).json({
+            success: true,
+            message: `Cleanup completed. Deleted ${deletedCount} duplicate favorites.`,
+            deletedCount
+        });
+        
+    } catch (error) {
+        console.error("Error cleaning up favorites:", error);
+        return next(new ErrorHandler("Failed to cleanup favorites", 500));
+    }
+});

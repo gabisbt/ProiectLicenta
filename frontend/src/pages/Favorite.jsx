@@ -132,6 +132,27 @@ const Favorites = () => {
   // Add a toggle function you can use with a button if needed
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
+  // Adaugă după useEffect care încarcă favorit-urile:
+  useEffect(() => {
+    if (favorites && favorites.length > 0) {
+        console.log("=== DEBUG FAVORITES ===");
+        console.log("Number of favorites:", favorites.length);
+        console.log("Favorites data:", favorites);
+        
+        // Verifică duplicatele
+        const ids = favorites.map(f => f._id);
+        const uniqueIds = [...new Set(ids)];
+        console.log("Unique IDs:", uniqueIds.length);
+        
+        if (ids.length !== uniqueIds.length) {
+            console.warn("DUPLICATE FAVORITES DETECTED!");
+            console.warn("Total favorites:", ids.length);
+            console.warn("Unique favorites:", uniqueIds.length);
+        }
+        console.log("=====================");
+    }
+  }, [favorites]);
+
   return (
     <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden pb-10">
       {/* Background Elements */}

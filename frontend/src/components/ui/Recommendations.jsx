@@ -1,14 +1,15 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPersonalizedRecommendations } from "@/store/slices/recommendationSlice";
-import Card from "@/custom-components/Card";
-  import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { getPersonalizedRecommendations } from "../../store/slices/recommendationSlice";
+import Card from "../../custom-components/Card";
 import { motion } from "framer-motion";
+import { FaStar, FaTrophy, FaFire, FaThumbsUp } from "react-icons/fa";
 
 const Recommendations = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { personalizedRecommendations, loading } = useSelector(
+  const { personalizedRecommendations, loading, userProfile } = useSelector(
     (state) => state.recommendation
   );
   const { isAuthenticated, user } = useSelector((state) => state.user);
@@ -19,28 +20,94 @@ const Recommendations = () => {
     }
   }, [dispatch, isAuthenticated, user]);
 
-  // Nu afișăm nimic dacă utilizatorul nu este autentificat sau nu este Bidder
-  // sau dacă nu există recomandări
+  const handleViewAllClick = () => {
+    navigate("/all-recommendations");
+  };
+
+  // Înlocuiește funcția handleAuctionClick cu:
+  const handleAuctionClick = (auctionId, auctionTitle) => {
+    console.log(' Starting navigation to auction:', { auctionId, auctionTitle });
+    
+    if (!auctionId) {
+      console.error('No auction ID provided');
+      return;
+    }
+    
+    try {
+      const url = `/auction/item/${auctionId}`;
+      console.log('About to navigate to URL:', url);
+      
+      // Folosește window.location în loc de navigate
+      window.location.href = url;
+      
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+  };
+
+  const getRankIcon = (rank) => {
+    switch (rank) {
+      case 'highly_recommended':
+        return <FaTrophy className="text-yellow-500" />;
+      case 'hot_deal':
+        return <FaFire className="text-red-500" />;
+      default:
+        return <FaThumbsUp className="text-blue-500" />;
+    }
+  };
+
+  const getRankLabel = (rank) => {
+    switch (rank) {
+      case 'highly_recommended':
+        return 'Highly Recommended';
+      case 'hot_deal':
+        return 'Hot Deal';
+      default:
+        return 'Recommended';
+    }
+  };
+
   if (!isAuthenticated || user?.role !== "Bidder" || !personalizedRecommendations?.length) {
     return null;
   }
 
   return (
     <section className="w-full px-5 py-16 lg:pl-[320px] bg-gradient-to-b from-[#e0f7fa] via-[#b2ebf2] to-[#80deea] relative overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute top-20 right-10 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div>
       
       <div className="relative z-10 max-w-6xl mx-auto w-full">
         <div className="text-center mb-12">
           <h3 className="text-[#134e5e] text-4xl font-extrabold mb-4">
-            Recommended <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf]">For You</span>
+            Personalized <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf]">For You</span>
           </h3>
+          
+          {/* Afișează profilul utilizatorului */}
+          {userProfile && (
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-6 inline-block">
+              <div className="flex items-center gap-4 text-sm text-[#134e5e]">
+                <div className="flex items-center gap-1">
+                  <FaStar className="text-yellow-500" />
+                  <span>Activity: {userProfile.activityLevel}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FaThumbsUp className="text-blue-500" />
+                  <span>Spending: {userProfile.spendingPattern}</span>
+                </div>
+                {userProfile.topCategories?.[0] && (
+                  <div className="flex items-center gap-1">
+                    <FaTrophy className="text-green-500" />
+                    <span>Loves: {userProfile.topCategories[0][0]}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
           <div className="w-20 h-1 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] mx-auto"></div>
         </div>
         
         <div className="bg-white/30 backdrop-blur-md p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/50 relative overflow-hidden">
-          {/* Elemente decorative de fundal */}
           <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
           <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-r from-[#2bd6bf]/10 to-[#00B3B3]/10 rounded-full blur-xl"></div>
           
@@ -50,54 +117,101 @@ const Recommendations = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10">
-              {personalizedRecommendations.slice(0, 4).map((auction) => (
+              {personalizedRecommendations.slice(0, 4).map((auction, index) => (
                 <motion.div
                   key={auction._id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="recommendation-card-wrapper" // Adaugă o clasă pentru a putea stiliza container-ul
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                  className="recommendation-card no-card-borders relative cursor-pointer transform transition-all duration-300 hover:scale-105"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎯 Card clicked:', auction.title, auction._id);
+                    
+                    // Adaugă un timeout mic pentru a asigura că evenimentul se procesează
+                    setTimeout(() => {
+                      handleAuctionClick(auction._id, auction.title);
+                    }, 10);
+                  }}
                 >
-                  {/* Adaugă un div wrapper cu stiluri specifice pentru a anula bordurile nedorite */}
-                  <div className="overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-300 border-0">
-                    <Card
-                      title={auction.title}
-                      startTime={auction.startTime}
-                      endTime={auction.endTime}
-                      imgSrc={auction.image?.url}
-                      startingBid={auction.startingBid}
-                      currentBid={auction.currentBid}
-                      id={auction._id}
-                      description={auction.description}
-                      className="border-0" // Adaugă această clasă pentru a suprascrie bordurile default
-                    />
+                  {/* Badge personalizat */}
+                  {auction.personalizedRank && auction.personalizedRank <= 2 && (
+                    <div className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                      {getRankIcon(auction.recommendationReasons?.[0])}
+                      #{auction.personalizedRank}
+                    </div>
+                  )}
+                  
+                  {/* Scor de recomandare */}
+                  <div className="absolute top-2 left-2 z-10 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
+                    {Math.round(auction.recommendationScore)}% match
                   </div>
+                  
+                  {/* Înlocuiește Card cu o structură simplă pentru a evita conflicte */}
+                  <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+                    {/* Imagine */}
+                    <div className="relative h-48 bg-gray-50 overflow-hidden">
+                      {auction.image?.url ? (
+                        <img
+                          src={auction.image.url}
+                          alt={auction.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="text-gray-400 text-4xl">📦</div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Conținut */}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">
+                        {auction.title}
+                      </h3>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+                        <span>{auction.category}</span>
+                        <span>{auction.condition}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-[#00B3B3] font-semibold">
+                          {auction.currentBid || auction.startingBid} RON
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          Starting: {auction.startingBid} RON
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Motivele recomandării */}
+                  {auction.recommendationReasons && auction.recommendationReasons.length > 0 && (
+                    <div className="mt-2 p-2 bg-white/50 rounded-lg">
+                      <p className="text-xs text-gray-700 truncate">
+                        💡 {auction.recommendationReasons[0]}
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
           )}
-          
-          {personalizedRecommendations.length > 4 && (
-            <div className="mt-8 text-center relative z-10">
-              <Link
-                to="/recommendations"
+
+          {personalizedRecommendations?.length > 4 && (
+            <div className="text-center mt-8">
+              <button
+                onClick={handleViewAllClick}
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] hover:from-[#009999] hover:to-[#00B3B3] shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
-                View All Recommendations
-              </Link>
+                Vezi toate recomandările personalizate
+              </button>
             </div>
           )}
         </div>
       </div>
-      
-      {/* Adaugă un stil global pentru a suprascrie bordurile din carduri doar în secțiunea de recomandări */}
-      <style jsx>{`
-        .recommendation-card-wrapper a,
-        .recommendation-card-wrapper div {
-          border-left: none !important;
-          border-right: none !important;
-        }
-      `}</style>
     </section>
   );
 };

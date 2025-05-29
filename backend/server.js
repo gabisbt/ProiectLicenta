@@ -42,7 +42,6 @@ io.on("connection", (socket) => {
     socket.join(`auction:${auctionId}`);
     console.log(`Socket ${socket.id} joined auction:${auctionId}`);
     
-    // Opțional: notifica clientul ca s-a conectat cu succes
     socket.emit("auctionJoined", {
       auctionId,
       message: "Connected to auction updates"
@@ -55,11 +54,32 @@ io.on("connection", (socket) => {
     console.log(`Socket ${socket.id} left auction:${auctionId}`);
   });
   
-  // Join user's personal room for notifications
+  // Join user's personal room for notifications and messages
   socket.on("authenticate", (userId) => {
     if (userId) {
       socket.join(`user:${userId}`);
       console.log(`Socket ${socket.id} authenticated for user:${userId}`);
+      
+      // Confirmă autentificarea
+      socket.emit("authenticated", { userId });
+    }
+  });
+  
+  // Handle joining chat rooms for specific conversations
+  socket.on("joinChat", ({ auctionId, userId }) => {
+    if (auctionId && userId) {
+      const chatRoom = `chat:${auctionId}:${userId}`;
+      socket.join(chatRoom);
+      console.log(`Socket ${socket.id} joined chat room: ${chatRoom}`);
+    }
+  });
+  
+  // Handle leaving chat rooms
+  socket.on("leaveChat", ({ auctionId, userId }) => {
+    if (auctionId && userId) {
+      const chatRoom = `chat:${auctionId}:${userId}`;
+      socket.leave(chatRoom);
+      console.log(`Socket ${socket.id} left chat room: ${chatRoom}`);
     }
   });
   

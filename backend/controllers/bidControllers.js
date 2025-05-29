@@ -4,6 +4,7 @@ import { Auction } from "../models/auctionSchema.js";
 import { Bid } from "../models/bidSchema.js";
 import { User } from "../models/userSchema.js";
 import { io } from "../server.js";
+import { sendEmail } from "../utils/sendEmail.js"; 
 
 export const placeBid = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params; // Extragem id-ul articolului de licitație
@@ -199,6 +200,112 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
         },
         message: "Auction has ended - Item was purchased using Buy Now"
     });
+
+    // ADAUGĂ ACEASTĂ SECȚIUNE PENTRU EMAIL-URI:
+    console.log('📧 PREPARING BUY NOW EMAILS...');
+
+    try {
+        // Email pentru cumpărător
+        const buyerSubject = `🎉 Purchase Confirmed: ${auction.title}`;
+        const buyerMessage = `
+Dear ${bidderDetail.userName},
+
+🎉 Congratulations! You have successfully purchased "${auction.title}" using Buy Now for ${auction.buyNowPrice} RON.
+
+📋 Purchase Details:
+- Item: ${auction.title}
+- Category: ${auction.category}
+- Condition: ${auction.condition}
+- Purchase Price: ${auction.buyNowPrice} RON
+- Purchase Date: ${new Date().toLocaleDateString()}
+- Purchase Method: Buy Now
+
+📞 Seller Contact Information:
+- Name: ${seller.userName}
+- Email: ${seller.email}
+
+💳 Payment Methods Available:
+${seller.paymentMethods?.bankTransfer ? `
+1. Bank Transfer:
+   - Account Name: ${seller.paymentMethods.bankTransfer.bankAccountName || 'Not provided'}
+   - Account Number: ${seller.paymentMethods.bankTransfer.bankAccountNumber || 'Not provided'}
+   - Bank: ${seller.paymentMethods.bankTransfer.bankName || 'Not provided'}
+` : ''}
+${seller.paymentMethods?.paypal?.paypalEmail ? `
+2. PayPal:
+   - Send payment to: ${seller.paymentMethods.paypal.paypalEmail}
+` : ''}
+3. Cash on Delivery (COD):
+   - Pay 20% upfront using any of the above methods
+   - Remaining 80% on delivery
+
+📝 Next Steps:
+1. Contact the seller: ${seller.email}
+2. Arrange payment method and delivery details
+3. Complete the payment process
+
+Thank you for using RetroShop!
+
+Best regards,
+RetroShop Team`;
+
+        console.log(`📧 Sending Buy Now email to buyer: ${bidderDetail.email}`);
+        
+        await sendEmail({ 
+            email: bidderDetail.email, 
+            subject: buyerSubject, 
+            message: buyerMessage 
+        });
+        
+        console.log('✅ Buy Now email sent to buyer successfully');
+
+        // Email pentru vânzător
+        const sellerSubject = `💰 Item Sold via Buy Now: ${auction.title}`;
+        const sellerMessage = `
+Dear ${seller.userName},
+
+💰 Great news! Your item "${auction.title}" has been sold via Buy Now!
+
+📋 Sale Details:
+- Buyer: ${bidderDetail.userName}
+- Buyer Email: ${bidderDetail.email}
+- Sale Price: ${auction.buyNowPrice} RON
+- Sale Date: ${new Date().toLocaleDateString()}
+- Sale Method: Buy Now
+
+📞 Buyer Contact Information:
+- Name: ${bidderDetail.userName}
+- Email: ${bidderDetail.email}
+
+📝 Next Steps:
+1. The buyer will contact you to arrange payment and delivery
+2. Prepare the item for shipment
+3. Wait for payment confirmation
+4. Arrange delivery with the buyer
+
+💵 Commission Information:
+- A 5% commission has been added to your unpaid commission balance
+- Please ensure to pay your commission after receiving payment from the buyer
+
+Congratulations on your successful sale!
+
+Best regards,
+RetroShop Team`;
+
+        console.log(`📧 Sending Buy Now email to seller: ${seller.email}`);
+        
+        await sendEmail({ 
+            email: seller.email, 
+            subject: sellerSubject, 
+            message: sellerMessage 
+        });
+        
+        console.log('✅ Buy Now email sent to seller successfully');
+
+    } catch (emailError) {
+        console.error('❌ Error sending Buy Now emails:', emailError);
+        // Nu opri procesul pentru eroarea de email
+    }
 
     res.status(200).json({
         success: true,

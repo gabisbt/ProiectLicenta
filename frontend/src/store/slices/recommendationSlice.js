@@ -54,17 +54,17 @@ export const getSimilarAuctions = createAsyncThunk(
 );
 
 const recommendationSlice = createSlice({
-  name: "recommendations",
+  name: "recommendation",
   initialState: {
     personalizedRecommendations: [],
-    similarAuctions: [],
+    userProfile: null, // Adaugă aceasta
     loading: false,
     error: null,
   },
   reducers: {
     clearRecommendations: (state) => {
       state.personalizedRecommendations = [];
-      state.similarAuctions = [];
+      state.userProfile = null;
     },
   },
   extraReducers: (builder) => {
@@ -72,13 +72,14 @@ const recommendationSlice = createSlice({
       // Personalized recommendations
       .addCase(getPersonalizedRecommendations.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(
         getPersonalizedRecommendations.fulfilled,
         (state, action) => {
           state.loading = false;
-          state.personalizedRecommendations = action.payload.recommendations;
-          state.error = null;
+          state.personalizedRecommendations = action.payload.recommendations || [];
+          state.userProfile = action.payload.userProfile || null; // Adaugă aceasta
         }
       )
       .addCase(getPersonalizedRecommendations.rejected, (state, action) => {

@@ -54,32 +54,52 @@ const Recommendations = () => {
               placeholder="Caută în recomandări..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B3B3] focus:border-transparent"
+              className="w-full max-w-md px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00B3B3] focus:border-transparent"
             />
-            <FaSearch className="absolute top-3 left-3 text-gray-400" />
+            <FaSearch className="absolute left-3 top-3 text-gray-400" />
           </div>
         </div>
 
         {loading ? (
-          <div className="flex justify-center my-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00B3B3]"></div>
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B3B3]"></div>
           </div>
         ) : (
           <>
             {filteredRecommendations.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredRecommendations.map((auction) => (
-                  <Link key={auction._id} to={`/auction-item/${auction._id}`}>
+                  <div
+                    key={auction._id}
+                    className="cursor-pointer transform transition-transform hover:scale-105"
+                    onClick={() => handleAuctionClick(auction._id)} // Adaugă onClick handler
+                  >
                     <Card
+                      imgSrc={auction.image?.url}
                       title={auction.title}
-                      description={auction.description}
-                      imgSrc={auction.image.url}
+                      category={auction.category}
+                      condition={auction.condition}
                       startingBid={auction.startingBid}
                       startTime={auction.startTime}
                       endTime={auction.endTime}
                       currentBid={auction.currentBid}
                     />
-                  </Link>
+
+                    {/* Afișează motivele recomandării */}
+                    {auction.recommendationReasons &&
+                      auction.recommendationReasons.length > 0 && (
+                        <div className="mt-2 p-2 bg-white/80 rounded-lg border border-gray-100">
+                          <p className="text-xs text-gray-700">
+                            💡 {auction.recommendationReasons[0]}
+                          </p>
+                          {auction.recommendationScore && (
+                            <p className="text-xs text-[#00B3B3] font-medium">
+                              {Math.round(auction.recommendationScore)}% compatibilitate
+                            </p>
+                          )}
+                        </div>
+                      )}
+                  </div>
                 ))}
               </div>
             ) : (

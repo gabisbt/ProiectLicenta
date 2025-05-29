@@ -21,11 +21,11 @@ import ViewAuctionDetails from "./pages/ViewAuctionDetails";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Contact from "./pages/Contact";
 import UserProfile from "./pages/UserProfile";
-import NavBar from "./layout/NavBar";
 import ResetPassword from './pages/ResetPassword';
 import Favorites from "./pages/Favorite";
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import './styles/theme.css';
+// import Messages from './pages/Messages';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -63,6 +63,7 @@ const App = () => {
           <Route path="/me" element={<UserProfile />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/favorites" element={<Favorites />} />
+          {/* <Route path="/messages" element={<Messages />} /> */}
         </Routes>
         <ToastContainer position="top-right" />
       </Router>

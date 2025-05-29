@@ -3,14 +3,14 @@ import { RiAuctionFill, RiInstagramFill } from "react-icons/ri";
 import { MdLeaderboard, MdDashboard } from "react-icons/md";
 import { SiGooglesearchconsole } from "react-icons/si";
 import { BsFillInfoSquareFill } from "react-icons/bs";
-import { FaFacebook, FaUserCircle, FaEye, FaSignOutAlt, FaChevronRight, FaHeart } from "react-icons/fa";
+import { FaFacebook, FaUserCircle, FaEye, FaSignOutAlt, FaChevronRight, FaHeart, FaComment } from "react-icons/fa";
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import { IoIosCreate } from "react-icons/io";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/slices/userSlice";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, NavLink } from "react-router-dom";
 import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { useTheme } from "../context/ThemeContext.jsx";
 
@@ -241,6 +241,21 @@ const SideDrawer = () => {
                                 ))}
                             </ul>
                         </nav>
+
+                        {/* Mesaje - pentru Bidder si Auctioneer */}
+                        {/* {user && (user.role === "Bidder" || user.role === "Auctioneer") && (
+                            <div className="mt-4">
+                                <Link
+                                    to="/messages"
+                                    onClick={() => setShow(false)}
+                                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                                        hover:bg-[#f0f9ff] hover:text-[#00B3B3]"
+                                >
+                                    <FaComment className="text-2xl" />
+                                    <span className="font-medium text-lg">Mesaje</span>
+                                </Link>
+                            </div>
+                        )} */}
                     </div>
 
                     {/* Footer */}

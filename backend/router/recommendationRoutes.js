@@ -1,5 +1,8 @@
 import express from "express";
-import { getPersonalizedRecommendations, getSimilarAuctions } from "../controllers/recommendationController.js";
+import { 
+  getPersonalizedRecommendations, 
+  getSimilarAuctions 
+} from "../controllers/recommendationController.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -8,6 +11,6 @@ const router = express.Router();
 router.get("/personalized", isAuthenticated, getPersonalizedRecommendations);
 
 // Obține licitații similare pentru o licitație specifică
-router.get("/similar/:auctionId", getSimilarAuctions);
+router.get("/similar/:auctionId", getSimilarAuctions); // Această rută trebuie să existe!
 
 export default router;
