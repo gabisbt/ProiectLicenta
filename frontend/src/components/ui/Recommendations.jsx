@@ -24,25 +24,9 @@ const Recommendations = () => {
     navigate("/all-recommendations");
   };
 
-  // Înlocuiește funcția handleAuctionClick cu:
-  const handleAuctionClick = (auctionId, auctionTitle) => {
-    console.log(' Starting navigation to auction:', { auctionId, auctionTitle });
-    
-    if (!auctionId) {
-      console.error('No auction ID provided');
-      return;
-    }
-    
-    try {
-      const url = `/auction/item/${auctionId}`;
-      console.log('About to navigate to URL:', url);
-      
-      // Folosește window.location în loc de navigate
-      window.location.href = url;
-      
-    } catch (error) {
-      console.error('Navigation error:', error);
-    }
+  const handleAuctionClick = (auctionId) => {
+    console.log('Navigating to auction:', auctionId); // Pentru debugging
+    navigate(`/auction/item/${auctionId}`);
   };
 
   const getRankIcon = (rank) => {
@@ -72,7 +56,7 @@ const Recommendations = () => {
   }
 
   return (
-    <section className="w-full px-5 py-16 lg:pl-[320px] bg-gradient-to-b from-[#e0f7fa] via-[#b2ebf2] to-[#80deea] relative overflow-hidden">
+    <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] pb-10 flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa]">
       <div className="absolute top-20 right-10 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div>
       
@@ -127,7 +111,7 @@ const Recommendations = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🎯 Card clicked:', auction.title, auction._id);
+                    console.log(' Card clicked:', auction.title, auction._id);
                     
                     // Adaugă un timeout mic pentru a asigura că evenimentul se procesează
                     setTimeout(() => {

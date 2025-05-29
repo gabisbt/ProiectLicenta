@@ -7,18 +7,24 @@ import { Bid } from "../models/bidSchema.js";
 
 // Obține recomandări personalizate de licitații pentru un utilizator
 export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, next) => {
-    // Verifică dacă utilizatorul este autentificat
-    if (!req.user || !req.user._id) {
-        return next(new ErrorHandler("User not authenticated", 401));
-    }
+    console.log("🎯 Starting personalized recommendations for user:", req.user._id);
     
-    // Obține ID-ul utilizatorului
-    const userId = req.user._id;
-    
-    try {   
-        console.log("=== GENERATING PERSONALIZED RECOMMENDATIONS ===");
-        console.log("User ID:", userId);
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
         
+        if (!user) {
+            return next(new ErrorHandler("User not found", 404));
+        }
+
+        console.log("👤 User data:", {
+            userName: user.userName,
+            role: user.role,
+            favoriteAuctions: user.favoriteAuctions?.length || 0,
+            wonAuctionsDetails: user.wonAuctionsDetails?.length || 0,
+            moneySpent: user.moneySpent || 0
+        });
+
         // 1. Obține istoricul utilizatorului
         const userFavoritesRaw = await Favorite.find({ user: userId }).populate('auction');
         const userFavorites = userFavoritesRaw.filter(fav => fav.auction && fav.auction._id);
@@ -35,17 +41,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
         });
 
         const userBids = await Bid.find({ 'bidder.id': userId }).populate('auctionItem');
-        const user = await User.findById(userId).select('wonAuctionsDetails averageRating totalReviews moneySpent auctionsWon');
-        
-        console.log("User profile:", {
-            favorites: uniqueFavorites.length,
-            bids: userBids.length,
-            wonAuctions: user?.wonAuctionsDetails?.length || 0,
-            moneySpent: user?.moneySpent || 0,
-            auctionsWon: user?.auctionsWon || 0
-        });
-
-        // 2. Analizează preferințele utilizatorului cu scoring advanced
         const userProfile = {
             categories: new Map(),
             conditions: new Map(),
@@ -57,6 +52,7 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             excludedCategories: new Set() // Nou: categorii de evitat
         };
 
+        // 2. Analizează preferințele utilizatorului cu scoring advanced
         // 3. Analizează favoritele (weight: 3x)
         uniqueFavorites.forEach(fav => {
             if (fav.auction) {
@@ -129,50 +125,112 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
         // 7. Calculează intervalul de preț personalizat
         const pricePreferences = calculatePersonalizedPriceRange(userProfile.priceRanges, userProfile.spendingPattern);
 
-        // 8. Găsește licitații disponibile
+        // 8. Găsește licitații disponibile - VERSIUNEA RELAXATĂ
         const now = new Date();
-        const availableAuctions = await Auction.find({
+
+        // STRATEGIE MULTIPLĂ pentru a găsi licitații
+        let availableAuctions = [];
+        let searchStrategy = '';
+
+        // Strategia 1: Încearcă licitații ACTIVE
+        const activeAuctions = await Auction.find({
             createdBy: { $ne: userId },
             endTime: { $gt: now },
-            startTime: { $lt: now } // Doar licitații active
+            startTime: { $lte: now }
         })
         .populate('createdBy', 'userName averageRating')
-        .select('title category condition startingBid currentBid endTime startTime image createdBy');
+        .lean();
 
-        console.log("Available auctions:", availableAuctions.length);
+        console.log("🔍 Active auctions found:", activeAuctions.length);
 
-        // 9. Calculează scorurile personalizate pentru fiecare licitație
+        if (activeAuctions.length >= 5) {
+            availableAuctions = activeAuctions;
+            searchStrategy = 'active_only';
+        } else {
+            // Strategia 2: Include și licitațiile VIITOARE
+            const futureAuctions = await Auction.find({
+                createdBy: { $ne: userId },
+                startTime: { $gt: now }
+            })
+            .populate('createdBy', 'userName averageRating')
+            .lean();
+            
+            console.log("🔍 Future auctions found:", futureAuctions.length);
+            
+            availableAuctions = [...activeAuctions, ...futureAuctions];
+            searchStrategy = 'active_and_future';
+            
+            // Strategia 3: Dacă tot nu sunt suficiente, include TOATE (inclusiv terminate recent)
+            if (availableAuctions.length < 10) {
+                const allRecentAuctions = await Auction.find({
+                    createdBy: { $ne: userId },
+                    endTime: { $gt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Ultimele 7 zile
+                })
+                .populate('createdBy', 'userName averageRating')
+                .lean();
+                
+                console.log("🔍 All recent auctions found:", allRecentAuctions.length);
+                availableAuctions = allRecentAuctions;
+                searchStrategy = 'all_recent';
+            }
+        }
+
+        console.log("📋 Available auctions with strategy '" + searchStrategy + "':", availableAuctions.length);
+        console.log("📊 Sample auctions:", availableAuctions.slice(0, 3).map(a => ({
+            title: a.title,
+            category: a.category,
+            condition: a.condition,
+            startingBid: a.startingBid,
+            currentBid: a.currentBid,
+            startTime: a.startTime,
+            endTime: a.endTime,
+            isActive: now >= new Date(a.startTime) && now <= new Date(a.endTime),
+            isFuture: now < new Date(a.startTime),
+            isEnded: now > new Date(a.endTime)
+        })));
+
+        // Calculează scorurile cu debugging
         const recommendations = [];
+        let scoreDetails = [];
 
-        availableAuctions.forEach(auction => {
+        availableAuctions.forEach((auction, index) => {
             const score = calculatePersonalizedScore(auction, userProfile, pricePreferences);
             
-            if (score.total > 0) {
+            scoreDetails.push({
+                title: auction.title,
+                category: auction.category,
+                score: score.total,
+                reasons: score.reasons
+            });
+
+            if (score.total > 0) { // Temporar: acceptă orice scor pozitiv
                 recommendations.push({
-                    ...auction.toObject(),
+                    ...auction,
                     recommendationScore: score.total,
                     recommendationReasons: score.reasons,
                     personalizedRank: score.rank
                 });
             }
+
+            // Log primele 5 pentru debugging
+            if (index < 5) {
+                console.log(`🎯 Auction "${auction.title}": Score ${score.total}, Reasons: ${score.reasons.join(', ')}`);
+            }
         });
 
-        // 10. Sortează și limitează rezultatele
+        console.log("📊 Scoring results:", {
+            totalAuctions: availableAuctions.length,
+            scoredPositive: recommendations.length,
+            averageScore: scoreDetails.reduce((sum, s) => sum + s.score, 0) / scoreDetails.length
+        });
+
+        // Sortează și limitează
         const finalRecommendations = recommendations
             .sort((a, b) => b.recommendationScore - a.recommendationScore)
-            .slice(0, 20) // Mărește numărul pentru diversitate
-            .map((rec, index) => ({
-                ...rec,
-                recommendationRank: index + 1
-            }));
+            .slice(0, 20);
 
-        console.log("Generated recommendations:", finalRecommendations.length);
-        console.log("Top 3 recommendations:", finalRecommendations.slice(0, 3).map(r => ({
-            title: r.title,
-            score: r.recommendationScore,
-            reasons: r.recommendationReasons
-        })));
-        
+        console.log("🏆 Final recommendations:", finalRecommendations.length);
+
         res.status(200).json({
             success: true,
             recommendations: finalRecommendations,
@@ -180,11 +238,17 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
                 activityLevel: userProfile.activityLevel,
                 spendingPattern: userProfile.spendingPattern,
                 topCategories: Array.from(userProfile.categories.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3)
+            },
+            debug: {
+                availableAuctions: availableAuctions.length,
+                scoredRecommendations: recommendations.length,
+                finalCount: finalRecommendations.length,
+                sampleScores: scoreDetails.slice(0, 5)
             }
         });
         
     } catch (error) {
-        console.error("Error in getPersonalizedRecommendations:", error);
+        console.error("❌ Error in getPersonalizedRecommendations:", error);
         return next(new ErrorHandler(error.message || "Failed to generate recommendations", 500));
     }
 });
@@ -242,64 +306,99 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
     const reasons = [];
     let rank = 'standard';
 
-    // 1. Categoria (weight: 40%)
+    console.log(`\n🎯 Scoring auction: "${auction.title}" (${auction.category})`);
+
+    // 1. Categoria - MULT MAI PERMISIV
     const categoryScore = userProfile.categories.get(auction.category) || 0;
+    console.log(`   📂 Category "${auction.category}": ${categoryScore} interactions`);
+    
     if (categoryScore > 0) {
-        const categoryPoints = Math.min(categoryScore * 2, 20); // Max 20 puncte
+        const categoryPoints = Math.min(categoryScore * 3, 30); // Mărește multiplicatorul
         score += categoryPoints;
         reasons.push(`Interested in ${auction.category} (+${categoryPoints})`);
         
-        if (categoryScore >= 6) rank = 'highly_recommended';
+        if (categoryScore >= 3) rank = 'highly_recommended'; // Scade pragul
+    } else {
+        // Bonus pentru diversificare - IMPORTANT!
+        score += 5;
+        reasons.push(`New category: ${auction.category} (+5)`);
     }
 
-    // 2. Condiția (weight: 20%)
+    // 2. Condiția - MULT MAI TOLERANT
     const conditionScore = userProfile.conditions.get(auction.condition) || 0;
+    console.log(`   🔧 Condition "${auction.condition}": ${conditionScore} interactions`);
+    
     if (conditionScore > 0) {
-        const conditionPoints = Math.min(conditionScore * 1.5, 10); // Max 10 puncte
+        const conditionPoints = Math.min(conditionScore * 2, 15); // Mărește
         score += conditionPoints;
-        reasons.push(`Prefers ${auction.condition} condition (+${conditionPoints})`);
+        reasons.push(`Prefers ${auction.condition} (+${conditionPoints})`);
+    } else {
+        // Bonus pentru încercare de condiții noi
+        score += 3;
+        reasons.push(`Try ${auction.condition} condition (+3)`);
     }
 
-    // 3. Intervalul de preț (weight: 25%)
+    // 3. Preț - FOARTE TOLERANT
     const currentPrice = auction.currentBid || auction.startingBid;
+    console.log(`   💰 Price ${currentPrice} vs range ${pricePreferences.min}-${pricePreferences.max}`);
+    
     if (currentPrice >= pricePreferences.min && currentPrice <= pricePreferences.max) {
-        const pricePoints = 15;
-        score += pricePoints;
-        reasons.push(`Within price range (+${pricePoints})`);
+        score += 20;
+        reasons.push(`Perfect price range (+20)`);
     } else if (currentPrice < pricePreferences.min) {
-        // Preț mai mic decât preferat - bonus mic
-        const pricePoints = 5;
-        score += pricePoints;
-        reasons.push(`Great deal (+${pricePoints})`);
+        score += 15; // Mare bonus pentru oferte
+        reasons.push(`Great deal! Below your usual range (+15)`);
+    } else if (currentPrice <= pricePreferences.max * 1.5) { // 50% toleranță
+        score += 10;
+        reasons.push(`Slightly above range but worth it (+10)`);
+    } else {
+        score += 2; // Măcar ceva pentru toate
+        reasons.push(`Higher price (+2)`);
     }
 
-    // 4. Vânzător preferat (weight: 10%)
+    // 4. BONUS DE BAZĂ pentru toate licitațiile - CRUCIAL!
+    score += 8;
+    reasons.push(`Available auction (+8)`);
+
+    // 5. Vânzător
     if (userProfile.preferredSellers.has(auction.createdBy._id.toString())) {
-        const sellerPoints = 8;
-        score += sellerPoints;
-        reasons.push(`Trusted seller (+${sellerPoints})`);
+        score += 12;
+        reasons.push(`Trusted seller (+12)`);
         rank = 'highly_recommended';
     }
 
-    // 5. Rating vânzător (weight: 5%)
+    // 6. Rating vânzător
     if (auction.createdBy.averageRating) {
-        const ratingPoints = Math.floor(auction.createdBy.averageRating * 2); // Max 10 puncte
+        const ratingPoints = Math.floor(auction.createdBy.averageRating * 2);
         score += ratingPoints;
-        reasons.push(`Seller rating: ${auction.createdBy.averageRating}★ (+${ratingPoints})`);
+        reasons.push(`Seller: ${auction.createdBy.averageRating}★ (+${ratingPoints})`);
+    } else {
+        score += 2; // Bonus pentru vânzători noi
+        reasons.push(`New seller (+2)`);
     }
 
-    // 6. Bonus pentru diversitate (evită să recomande doar aceeași categorie)
-    const diversityBonus = userProfile.categories.size > 1 ? 3 : 0;
-    score += diversityBonus;
+    // 7. Activitate licitație
+    if (auction.currentBid > auction.startingBid) {
+        score += 5;
+        reasons.push(`Popular auction (+5)`);
+    } else {
+        score += 2;
+        reasons.push(`New auction opportunity (+2)`);
+    }
 
-    // 7. Timing bonus (licitații care se termină în curând)
+    // 8. Timing
     const timeLeft = new Date(auction.endTime) - new Date();
     const hoursLeft = timeLeft / (1000 * 60 * 60);
+    
     if (hoursLeft < 24 && hoursLeft > 1) {
-        const urgencyPoints = 5;
-        score += urgencyPoints;
-        reasons.push(`Ending soon (+${urgencyPoints})`);
+        score += 8;
+        reasons.push(`Ending soon - act fast! (+8)`);
+    } else if (hoursLeft >= 24) {
+        score += 4;
+        reasons.push(`Plenty of time (+4)`);
     }
+
+    console.log(`   ⭐ Final score: ${score.toFixed(1)}`);
 
     return {
         total: Math.round(score * 100) / 100,
@@ -525,6 +624,70 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
     } catch (error) {
         console.error('❌ Error in getSimilarAuctions:', error);
         return next(new ErrorHandler(error.message || "Failed to find similar auctions", 500));
+    }
+});
+
+// Adaugă în recommendationController.js:
+
+export const debugAuctions = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const now = new Date();
+        
+        // Statistici complete
+        const totalAuctions = await Auction.countDocuments();
+        const myAuctions = await Auction.countDocuments({ createdBy: userId });
+        const othersAuctions = await Auction.countDocuments({ createdBy: { $ne: userId } });
+        
+        const activeAuctions = await Auction.countDocuments({
+            createdBy: { $ne: userId },
+            startTime: { $lte: now },
+            endTime: { $gt: now }
+        });
+        
+        const futureAuctions = await Auction.countDocuments({
+            createdBy: { $ne: userId },
+            startTime: { $gt: now }
+        });
+        
+        const endedAuctions = await Auction.countDocuments({
+            createdBy: { $ne: userId },
+            endTime: { $lte: now }
+        });
+        
+        // Sample licitații
+        const sampleAll = await Auction.find({ createdBy: { $ne: userId } })
+            .select('title category startTime endTime createdBy')
+            .limit(10)
+            .lean();
+        
+        res.status(200).json({
+            success: true,
+            currentTime: now,
+            userId: userId,
+            statistics: {
+                total: totalAuctions,
+                mine: myAuctions,
+                others: othersAuctions,
+                othersActive: activeAuctions,
+                othersFuture: futureAuctions,
+                othersEnded: endedAuctions
+            },
+            sampleAuctions: sampleAll.map(auction => ({
+                title: auction.title,
+                category: auction.category,
+                startTime: auction.startTime,
+                endTime: auction.endTime,
+                isActive: now >= new Date(auction.startTime) && now <= new Date(auction.endTime),
+                isFuture: now < new Date(auction.startTime),
+                isEnded: now > new Date(auction.endTime),
+                isMyAuction: auction.createdBy.toString() === userId.toString()
+            }))
+        });
+        
+    } catch (error) {
+        console.error('Debug error:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 
