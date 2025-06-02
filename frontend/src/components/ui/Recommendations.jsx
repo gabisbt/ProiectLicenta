@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getPersonalizedRecommendations } from "../../store/slices/recommendationSlice";
-import Card from "../../custom-components/Card";
 import { motion } from "framer-motion";
 import { FaStar, FaTrophy, FaFire, FaThumbsUp } from "react-icons/fa";
 
@@ -25,7 +24,7 @@ const Recommendations = () => {
   };
 
   const handleAuctionClick = (auctionId) => {
-    console.log('Navigating to auction:', auctionId); // Pentru debugging
+    // console.log('Navigating to auction:', auctionId); // Pentru debugging
     navigate(`/auction/item/${auctionId}`);
   };
 

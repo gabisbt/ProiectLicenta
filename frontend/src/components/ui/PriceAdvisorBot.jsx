@@ -13,7 +13,7 @@ const PriceAdvisorBot = ({ auctionDetail, currentBid }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Inițializează cu mesajul de bun venit când componenta este montată
+  //Mesaj de inceput
   useEffect(() => {
     const price = currentBid || auctionDetail?.currentBid || auctionDetail?.startingBid || '?';
     setMessages([{ 
@@ -40,7 +40,7 @@ Ce dorești să știi?`
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
     
-    // Adaugă mesajul utilizatorului în chat
+    // Adauga mesajul utilizatorului in chat
     setMessages([...messages, { sender: 'user', text: inputMessage }]);
     
     const userQuery = inputMessage;
@@ -48,10 +48,10 @@ Ce dorești să știi?`
     setIsLoading(true);
     
     try {
-      // Obține token-ul din localStorage
+      // Obtine token-ul din localStorage
       const token = localStorage.getItem('token');
       
-      // Folosește URL-ul relativ pentru a evita probleme CORS
+      // Foloseste URL-ul relativ pentru a evita probleme CORS
       const response = await axios.post('/api/v1/price-advisor', 
         { 
           query: userQuery,
@@ -74,7 +74,7 @@ Ce dorești să știi?`
         setEvaluation(data.evaluation);
         setLastPriceRange(data.priceRange);
         
-        // Adaugă răspunsul botului în chat
+        // Adauga raspunsul botului în chat
         setMessages(prev => [
           ...prev, 
           { 
@@ -119,7 +119,7 @@ Ce dorești să știi?`
     const price = currentBid || auctionDetail?.currentBid || auctionDetail?.startingBid || 0;
     const numericPrice = parseFloat(price);
     
-    // Calculăm poziția relativă a prețului curent pe scală
+    // Calcul pozitia relativa a prețului curent pe scală
     const min = priceRange.low;
     const max = priceRange.high;
     const range = max - min;

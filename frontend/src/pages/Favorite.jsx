@@ -206,16 +206,27 @@ const Favorites = () => {
             {filteredFavorites.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">  
                 {filteredFavorites.map((auction, index) => (
-                  // MODIFICARE AICI: Acum renderăm Card direct în grid, fără div wrapper
-                  <Card
-                    key={auction._id || `favorite-${index}`}
-                    title={auction.title || "Untitled Auction"}
-                    startTime={auction.startTime}
-                    endTime={auction.endTime}
-                    imgSrc={auction.image?.url}
-                    startingBid={auction.startingBid}
-                    id={auction._id}
-                  />
+                  <div key={auction._id || `favorite-${index}`} className="relative">
+                    {/* Butonul de eliminare */}
+                    <button
+                      onClick={() => handleRemoveFromFavorites(auction._id, auction.title)}
+                      className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors shadow-lg"
+                      title="Remove from favorites"
+                    >
+                      <FaTrash className="text-sm" />
+                    </button>
+                    
+                    {/* Card-ul existent */}
+                    <Card
+                      title={auction.title || "Untitled Auction"}
+                      startTime={auction.startTime}
+                      endTime={auction.endTime}
+                      imgSrc={auction.image?.url}
+                      startingBid={auction.startingBid}
+                      currentBid={auction.currentBid}
+                      id={auction._id}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (
