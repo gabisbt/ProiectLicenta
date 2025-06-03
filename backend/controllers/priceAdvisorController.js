@@ -69,7 +69,7 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         console.log("Using Google Gemini API");
         console.log("Received query:", query);
         
-        // Analizeaza tipul intrebarii - VERSIUNE iMBUNaTatITa
+        // Analizeaza tipul intrebarii
         const priceKeywords = [
             'pret', 'pret', 'cost', 'val', 'merita', 'bun', 'scump', 'ieftin', 
             'licitati', 'cumpar', 'maxim', 'platesc', 'platesc', 'oferta', 
@@ -113,53 +113,52 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         let aiPrompt;
         
         if (isGeneralQuestion) {
-            // Pentru intrebari cu adevarat generale (ex: "ana are mere")
             aiPrompt = `
-Esti un asistent prietenos pentru o platforma de licitatii online.
-Utilizatorul te-a intrebat: "${query}"
+            Esti un asistent prietenos pentru o platforma de licitatii online.
+            Utilizatorul te-a intrebat: "${query}"
 
-Raspunde la intrebarea utilizatorului intr-un mod prietenos si util.
-Daca intrebarea nu are legatura cu licitatiile, raspunde politicos si incearca sa ii explici ca esti specializat in sfaturi despre licitatii si evaluarea preturilor.
+            Raspunde la intrebarea utilizatorului intr-un mod prietenos si util.
+            Daca intrebarea nu are legatura cu licitatiile, raspunde politicos si incearca sa ii explici ca esti specializat in sfaturi despre licitatii si evaluarea preturilor.
 
-Exemplu de raspuns pentru intrebari ne-relevante: "Salut! intrebarea ta nu pare sa aiba legatura cu licitatiile. Eu sunt specializat in a te ajuta sa evaluezi daca preturile la licitatii sunt corecte. Ai vreo intrebare despre ${productTitle} sau despre alte licitatii?"
+            Exemplu de raspuns pentru intrebari ne-relevante: "Salut! intrebarea ta nu pare sa aiba legatura cu licitatiile. Eu sunt specializat in a te ajuta sa evaluezi daca preturile la licitatii sunt corecte. Ai vreo intrebare despre ${productTitle} sau despre alte licitatii?"
 
-Raspunde in limba romana, maxim 100 de cuvinte.`;
+            Raspunde in limba romana, maxim 100 de cuvinte.`;
         } else {
             // Pentru intrebari despre licitatii (inclusiv "Cat ar trebui sa platesc maxim?")
             aiPrompt = `
-Esti un expert in evaluarea valorii produselor pentru licitatii online.
-Ofera sfaturi profesionale despre valoarea corecta a produselor bazandu-te pe datele de piata.
-Raspunde in limba romana, intr-un stil prietenos dar profesionist.
+                Esti un expert in evaluarea valorii produselor pentru licitatii online.
+        Ofera sfaturi profesionale despre valoarea corecta a produselor bazandu-te pe datele de piata.
+        Raspunde in limba romana, intr-un stil prietenos dar profesionist.
 
-CONTEXTUL LICITAtIEI:
-Utilizatorul se afla pe pagina produsului "${productTitle}" si intreaba: "${query}"
+        CONTEXTUL LICITAtIEI:
+        Utilizatorul se afla pe pagina produsului "${productTitle}" si intreaba: "${query}"
 
-ANALIZA PRODUSULUI:
-Titlu: ${productTitle}
-Descriere: ${productDescription || "Nu este disponibila"}
-Conditie: ${condition}
-Pret curent: ${currentBid} RON
+        ANALIZA PRODUSULUI:
+        Titlu: ${productTitle}
+        Descriere: ${productDescription || "Nu este disponibila"}
+        Conditie: ${condition}
+        Pret curent: ${currentBid} RON
 
-STATISTICI DE PIAta:
-- Pret minim observat: ${priceRange.low} RON
-- Pret mediu: ${priceRange.average} RON  
-- Pret median: ${priceRange.median} RON
-- Pret maxim observat: ${priceRange.high} RON
-- Produse similare analizate: ${similarAuctions.length}
+        STATISTICI DE PIAta:
+        - Pret minim observat: ${priceRange.low} RON
+        - Pret mediu: ${priceRange.average} RON  
+        - Pret median: ${priceRange.median} RON
+        - Pret maxim observat: ${priceRange.high} RON
+        - Produse similare analizate: ${similarAuctions.length}
 
-${similarListings.length > 0 ? `EXEMPLE DE PRODUSE SIMILARE VaNDUTE:
-${similarListings.map(item => `• "${item.title}" (${item.condition}) - ${item.finalPrice} RON - ${item.endDate}`).join('\n')}` : ''}
+        ${similarListings.length > 0 ? `EXEMPLE DE PRODUSE SIMILARE VaNDUTE:
+        ${similarListings.map(item => `• "${item.title}" (${item.condition}) - ${item.finalPrice} RON - ${item.endDate}`).join('\n')}` : ''}
 
-INSTRUCtIUNI:
-Raspunde DIRECT la intrebarea utilizatorului despre acest produs specific.
-Pentru intrebari despre pret maxim, recomanda o suma concreta bazata pe statisticile de piata.
-Include in raspuns:
-1. Raspunsul direct la intrebarea utilizatorului
-2. Evaluarea valorii pentru acest produs specific
-3. Recomandarea ta despre suma maxima de platit
-4. Justificarea bazata pe datele de piata
+        INSTRUCtIUNI:
+        Raspunde DIRECT la intrebarea utilizatorului despre acest produs specific.
+        Pentru intrebari despre pret maxim, recomanda o suma concreta bazata pe statisticile de piata.
+        Include in raspuns:
+        1. Raspunsul direct la intrebarea utilizatorului
+        2. Evaluarea valorii pentru acest produs specific
+        3. Recomandarea ta despre suma maxima de platit
+        4. Justificarea bazata pe datele de piata
 
-Raspunde concis in maxim 150 de cuvinte.`;
+        Raspunde concis in maxim 150 de cuvinte.`;
         }
         
         try {

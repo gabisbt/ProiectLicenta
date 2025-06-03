@@ -80,7 +80,7 @@ const Recommendations = () => {
                 {userProfile.topCategories?.[0] && (
                   <div className="flex items-center gap-1">
                     <FaTrophy className="text-green-500" />
-                    <span>Loves: {userProfile.topCategories[0][0]}</span>
+                    <span>Favorite category: {userProfile.topCategories[0][0]}</span>
                   </div>
                 )}
               </div>

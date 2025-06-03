@@ -5,7 +5,7 @@ import { FaHeart, FaSearch, FaTrash, FaRegCalendarAlt, FaGavel } from "react-ico
 import {
   removeFromFavorites,
   getFavorites,
-  resetFavorites // asigură-te că această acțiune există sau adaug-o
+  resetFavorites // asigura-te ca aceasta actiune exista sau adaug-o
 } from "@/store/slices/favoriteSlice";
 import Spinner from "@/custom-components/Spinner";
 import Card from "@/custom-components/Card";
@@ -28,7 +28,7 @@ const Favorites = () => {
   const navigateTo = useNavigate();
 
 
-  // Redirecționare pentru utilizatori neautentificați
+  // Redirectionare pentru utilizatori neautentificati
   useEffect(() => {
     if (!isAuthenticated) {
       navigateTo("/login");
@@ -41,21 +41,21 @@ const Favorites = () => {
     }
   }, [isAuthenticated, user, navigateTo]);
 
-  // Detectează schimbarea utilizatorului și resetează lista de favorite
+  // Detecteaza schimbarea utilizatorului si reseteaza lista de favorite
   useEffect(() => {
-    // Resetează starea favorit-urilor când utilizatorul se schimbă
+    // Reseteaza starea favorit-urilor cand utilizatorul se schimba
     if (previousUser.current && user && previousUser.current._id !== user._id) {
       console.log("User changed, resetting favorites");
-      dispatch(resetFavorites()); // Acțiune pentru a reseta starea favorit-urilor
-      favoritesLoaded.current = false; // Permite reîncărcarea favorit-urilor
+      dispatch(resetFavorites()); // Actiune pentru a reseta starea favorit-urilor
+      favoritesLoaded.current = false; // Permite reincarcarea favorit-urilor
     }
     
-    // Salvează utilizatorul curent pentru comparații viitoare
+    // Salveaza utilizatorul curent pentru comparatii viitoare
     if (user) {
       previousUser.current = user;
     }
     
-    // Încarcă favorit-urile pentru utilizatorul curent
+    // incarca favorit-urile pentru utilizatorul curent
     if (isAuthenticated && user?.role === "Bidder" && !favoritesLoaded.current) {
       dispatch(getFavorites());
       favoritesLoaded.current = true;
@@ -71,9 +71,9 @@ const Favorites = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filtreaza favoritele în functie de termenul de cautare
+  // Filtreaza favoritele in functie de termenul de cautare
   useEffect(() => {
-    // Verificăm că favorites există și este un array
+    // Verificam ca favorites exista si este un array
     if (Array.isArray(favorites)) {
       setFilteredFavorites(
         favorites.filter(item =>
@@ -132,14 +132,14 @@ const Favorites = () => {
   // Add a toggle function you can use with a button if needed
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
-  // Adaugă după useEffect care încarcă favorit-urile:
+  // Adauga dupa useEffect care incarca favorit-urile:
   useEffect(() => {
     if (favorites && favorites.length > 0) {
         console.log("=== DEBUG FAVORITES ===");
         console.log("Number of favorites:", favorites.length);
         console.log("Favorites data:", favorites);
         
-        // Verifică duplicatele
+        // Verifica duplicatele
         const ids = favorites.map(f => f._id);
         const uniqueIds = [...new Set(ids)];
         console.log("Unique IDs:", uniqueIds.length);
@@ -230,7 +230,7 @@ const Favorites = () => {
                 ))}
               </div>
             ) : (
-              // Componenta pentru "No favorites found" rămâne neschimbată
+              // Componenta pentru "No favorites found" ramane neschimbata
               <div className="flex flex-col items-center justify-center py-20 px-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/30 shadow-md">
                 <div className="bg-red-100/50 p-6 rounded-full mb-6">
                   <FaHeart className="text-red-400 text-5xl" />
