@@ -52,21 +52,21 @@ const AuctionItem = () => {
   // const [showChat, setShowChat] = useState(false);
   // const [chatUser, setChatUser] = useState(null);
 
-  const navigateTo = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Adauga o functie pentru a verifica daca utilizatorul este vanzator
   const isUserSeller = user?._id === auctionDetail?.createdBy;
 
   useEffect(() => {
-    console.log('✅ AuctionItem loaded/reloaded with ID:', id);
+    console.log('AuctionItem loaded/reloaded with ID:', id);
     
     setTimeout(() => {
       setIsLoaded(true);
     }, 300);
 
     if (!isAuthenticated) {
-      navigateTo("/");
+      navigate("/");
       return;
     }
     
@@ -973,6 +973,95 @@ const AuctionItem = () => {
           )}
         </>
       )} */}
+
+      {/* Secțiunea informații vânzător - integrată în design */}
+      {auctionDetail && !loading && (
+        <div className="max-w-7xl mx-auto w-full mt-8 mb-8">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-3 rounded-full">
+                  <FaUser className="text-xl" />
+                </div>
+                <h3 className="text-[#134e5e] text-2xl font-bold">Seller Informations</h3>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                {/* Avatar vânzător */}
+                <div className="w-20 h-20 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                  {auctionDetail.createdBy?.profileImage?.url ? (
+                    <img 
+                      src={auctionDetail.createdBy.profileImage.url} 
+                      alt={auctionDetail.createdBy.userName || 'Seller'} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : (
+                    <FaUser className="text-white text-2xl" />
+                  )}
+                  <div className="w-full h-full bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] rounded-full items-center justify-center hidden">
+                    <FaUser className="text-white text-2xl" />
+                  </div>
+                </div>
+                
+                {/* Informații vânzător */}
+                <div className="flex-1">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-[#00B3B3]/10 p-2 rounded-full">
+                        <FaUser className="text-[#00B3B3]" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600">Seller's name</div>
+                        <div className="font-semibold text-[#134e5e] text-lg">
+                          {auctionDetail.createdBy?.userName || 'Nume indisponibil'}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="bg-[#00B3B3]/10 p-2 rounded-full">
+                        <FaInfoCircle className="text-[#00B3B3]" />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-600">Email contact</div>
+                        <div className="font-semibold text-[#134e5e] text-lg">
+                          {auctionDetail.createdBy?.email || 'Email indisponibil'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Buton pentru a vedea toate licitațiile */}
+                  <button 
+                    className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white px-6 py-3 rounded-xl hover:from-[#009999] hover:to-[#1fb8a8] transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                    onClick={() => {
+                      const sellerId = auctionDetail?.createdBy?._id || auctionDetail?.createdBy;
+                      console.log("🔍 Seller data:", auctionDetail.createdBy);
+                      console.log("🔍 Navigating to seller auctions with ID:", sellerId);
+                      if (sellerId && sellerId !== 'undefined') {
+                        navigate(`/seller/${sellerId}/auctions`);
+                      } else {
+                        toast.error("Informațiile vânzătorului nu sunt disponibile");
+                      }
+                    }}
+                    disabled={!auctionDetail?.createdBy?._id && !auctionDetail?.createdBy}
+                  >
+                    <FaGavel className="text-lg" />
+                  See all auctions from this seller
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

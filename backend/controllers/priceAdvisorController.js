@@ -24,7 +24,7 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
                 { category: { $regex: new RegExp(productTitle.split(' ')[0], 'i') } }
             ],
             condition: condition,
-            endTime: { $lt: new Date() },
+            endTime: { $lt: new Date() },   
             highestBidder: { $exists: true, $ne: null }
         }).sort({ endTime: -1 }).limit(15);
         
@@ -128,6 +128,8 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
             aiPrompt = `
                 Esti un expert in evaluarea valorii produselor pentru licitatii online.
         Ofera sfaturi profesionale despre valoarea corecta a produselor bazandu-te pe datele de piata.
+        Vezi daca poti sa gasesti informatii despre preturile de licitatie pentru produse similare.
+        Raspunde la intrebarea utilizatorului despre produsul "${productTitle}" in contextul licitatiei.
         Raspunde in limba romana, intr-un stil prietenos dar profesionist.
 
         CONTEXTUL LICITAtIEI:
@@ -139,7 +141,7 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         Conditie: ${condition}
         Pret curent: ${currentBid} RON
 
-        STATISTICI DE PIAta:
+        STATISTICI DE PIAtA:
         - Pret minim observat: ${priceRange.low} RON
         - Pret mediu: ${priceRange.average} RON  
         - Pret median: ${priceRange.median} RON

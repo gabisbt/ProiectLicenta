@@ -304,3 +304,85 @@ export const getWonAuctions = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler(error.message || "Failed to fetch won auctions", 500));
     }
 });
+
+export const getAllAuctionsBySeller = catchAsyncErrors(async (req, res, next) => {
+    const { sellerId } = req.params;
+    const { status } = req.query;
+    
+    console.log("getAllAuctionsBySeller called with:", { sellerId, status });
+    
+    if (!sellerId || sellerId === 'undefined' || !mongoose.Types.ObjectId.isValid(sellerId)) {
+        return next(new ErrorHandler("Invalid seller ID", 400));
+    }
+    
+    try {
+        // Găsește TOATE licitațiile vânzătorului
+        const allAuctions = await Auction.find({ createdBy: sellerId })
+            .populate("createdBy", "userName email profileImage")
+            .sort({ createdAt: -1 });
+        
+        const currentTime = new Date();
+        console.log("Current time:", currentTime.toISOString());
+        console.log("Total auctions found:", allAuctions.length);
+        
+        // Filtrează în JavaScript în loc de MongoDB
+        let filteredAuctions = allAuctions;
+        
+        if (status === 'active') {
+            filteredAuctions = allAuctions.filter(auction => {
+                const start = new Date(auction.startTime);
+                const end = new Date(auction.endTime);
+                const isActive = start <= currentTime && end > currentTime;
+                console.log(`🔍 ${auction.title}: ${isActive ? 'ACTIVE' : 'NOT ACTIVE'}`);
+                return isActive;
+            });
+            console.log("Active auctions after filter:", filteredAuctions.length);
+            
+        } else if (status === 'ended') {
+            filteredAuctions = allAuctions.filter(auction => {
+                const end = new Date(auction.endTime);
+                const isEnded = end <= currentTime;
+                console.log(`🔍 ${auction.title}: ${isEnded ? 'ENDED' : 'NOT ENDED'}`);
+                return isEnded;
+            });
+            console.log("Ended auctions after filter:", filteredAuctions.length);
+        }
+        
+        // Calculează statistici
+        const stats = {
+            total: allAuctions.length,
+            active: 0,
+            ended: 0
+        };
+        
+        allAuctions.forEach(auction => {
+            const start = new Date(auction.startTime);
+            const end = new Date(auction.endTime);
+            const isActive = start <= currentTime && end > currentTime;
+            const isEnded = end <= currentTime;
+            
+            if (isActive) stats.active++;
+            if (isEnded) stats.ended++;
+        });
+        
+        // Găsește informațiile vânzătorului
+        const sellerInfo = allAuctions.length > 0 
+            ? allAuctions[0].createdBy 
+            : await User.findById(sellerId).select("userName email profileImage");
+        
+        console.log(`Final result: ${filteredAuctions.length} auctions`);
+        console.log(`Statistics:`, stats);
+        
+        res.status(200).json({
+            success: true,
+            auctionsCount: filteredAuctions.length,
+            auctions: filteredAuctions,
+            seller: sellerInfo,
+            statistics: stats
+        });
+        
+    } catch (error) {
+        console.error("Error:", error);
+        return next(new ErrorHandler("Failed to fetch seller auctions: " + error.message, 500));
+    }
+});

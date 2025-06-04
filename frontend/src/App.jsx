@@ -27,6 +27,7 @@ import { ThemeProvider } from './context/ThemeContext.jsx';
 import './styles/theme.css';
 import AllRecommendations from "./pages/AllRecommendations";
 // import Messages from './pages/Messages';
+import SellerAuctions from './pages/SellerAuctions';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -65,6 +66,7 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/all-recommendations" element={<AllRecommendations />} />
+          <Route path="/seller/:sellerId/auctions" element={<SellerAuctions />} />
 
           {/* <Route path="/messages" element={<Messages />} /> */}
         </Routes>
