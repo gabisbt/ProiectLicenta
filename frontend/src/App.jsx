@@ -26,10 +26,9 @@ import Favorites from "./pages/Favorite";
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import './styles/theme.css';
 import AllRecommendations from "./pages/AllRecommendations";
-// import Messages from './pages/Messages';
 import SellerAuctions from './pages/SellerAuctions';
 
-const App = () => {
+const App = () => { 
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -41,12 +40,10 @@ const App = () => {
     dispatch(fetchLeaderboard());
   }, [dispatch]);
 
-  return (
-    // Înfășoară întreaga aplicație în ThemeProvider
+  return (  
     <ThemeProvider>
       <Router>  
         <SideDrawer />
-        {/* <NavBar/> */}
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/sign-up" element={<SignUp />} />
@@ -67,8 +64,6 @@ const App = () => {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/all-recommendations" element={<AllRecommendations />} />
           <Route path="/seller/:sellerId/auctions" element={<SellerAuctions />} />
-
-          {/* <Route path="/messages" element={<Messages />} /> */}
         </Routes>
         <ToastContainer position="top-right" />
       </Router>
