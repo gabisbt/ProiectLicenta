@@ -225,19 +225,20 @@ const SellerAuctions = () => {
                             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-white/50 text-center">
                                 <FaGavel className="text-gray-300 text-6xl mx-auto mb-4" />
                                 <h3 className="text-[#134e5e] text-xl font-semibold mb-2">
-                                    Nu există licitații {activeTab === 'all' ? '' : activeTab}
+                                    There are no auctions{activeTab === 'all' ? '' : activeTab}
                                 </h3>
                                 <p className="text-gray-600 mb-6">
                                     {activeTab === 'all' 
-                                        ? 'Acest utilizator nu a creat încă nicio licitație.' 
-                                        : `Acest utilizator nu are licitații ${activeTab}.`
+                                        ? 'This user has not created any auctions yet..' 
+                                        : `This user has no auctions. ${activeTab}.`
                                     }
                                 </p>
                                 <Link 
                                     to="/auctions"
                                     className="inline-block bg-[#00B3B3] text-white px-6 py-3 rounded-lg hover:bg-[#009999] transition-colors font-medium"
                                 >
-                                    Explorează alte licitații
+                                    
+                                    Explore other auctions
                                 </Link>
                             </div>
                         </div>

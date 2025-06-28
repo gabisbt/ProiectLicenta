@@ -2,17 +2,14 @@ import React, { useEffect } from 'react';
 import { FaTimes } from 'react-icons/fa';
 
 const Modal = ({ children, onClose }) => {
-  // Previne scroll-ul în pagină când modalul este deschis
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     
-    // Cleanup function pentru a restaura scroll-ul când modalul se închide
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, []);
 
-  // Oprește propagarea click-ului în modal pentru a preveni închiderea accidentală
   const handleModalClick = (e) => {
     e.stopPropagation();
   };

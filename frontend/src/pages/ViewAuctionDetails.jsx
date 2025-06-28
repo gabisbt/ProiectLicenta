@@ -338,9 +338,9 @@ const ViewAuctionDetails = () => {
                             <div className="bg-gray-100/50 p-5 rounded-full mb-4">
                               <FaGavel className="text-gray-500 text-4xl" />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Auction Ended</h3>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">Auction without bids</h3>
                             <p className="text-gray-600 max-w-xs">
-                              This auction ended on {formatDate(auctionDetail.endTime)}
+                              This auction will end on {formatDate(auctionDetail.endTime)}
                             </p>
                             {auctionBidders && auctionBidders.length > 0 ? (
                               <div className="mt-6 bg-green-50 border border-green-200 p-4 rounded-xl w-full">

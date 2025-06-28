@@ -27,10 +27,10 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
         { withCredentials: true }
       );
       
-      console.log('✅ Similar auctions response:', response.data);
+      console.log('Similar auctions response:', response.data);
       setSimilarAuctions(response.data.similarAuctions || []);
     } catch (error) {
-      console.error('❌ Error fetching similar auctions:', error);
+      console.error('Error fetching similar auctions:', error);
     } finally {
       setLoading(false);
     }

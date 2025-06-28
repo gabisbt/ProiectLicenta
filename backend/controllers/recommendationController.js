@@ -5,7 +5,6 @@ import { Auction } from "../models/auctionSchema.js";
 import { Favorite } from "../models/favoriteSchema.js";
 import { Bid } from "../models/bidSchema.js";
 
-// Obtine recomandari personalizate de licitatii pentru un utilizator
 export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, next) => {
     console.log("Starting personalized recommendations for user:", req.user._id);
     
@@ -17,7 +16,7 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             return next(new ErrorHandler("User not found", 404));
         }
 
-        console.log("👤 User data:", {
+        console.log("User data:", {
             userName: user.userName,
             role: user.role,
             favoriteAuctions: user.favoriteAuctions?.length || 0,
@@ -25,11 +24,9 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             moneySpent: user.moneySpent || 0
         });
 
-        // 1. Obtine istoricul utilizatorului
         const userFavoritesRaw = await Favorite.find({ user: userId }).populate('auction');
         const userFavorites = userFavoritesRaw.filter(fav => fav.auction && fav.auction._id);
         
-        // Elimina duplicatele
         const uniqueFavorites = [];
         const seenAuctionIds = new Set();
         userFavorites.forEach(fav => {
@@ -42,7 +39,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
 
         const userBids = await Bid.find({ 'bidder.id': userId }).populate('auctionItem');
         
-        // 2. CONSTRUIEsTE PROFILUL UTILIZATORULUI
         const userProfile = {
             categories: new Map(),
             conditions: new Map(),
@@ -61,32 +57,30 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             userType: 'casual_user'
         };
 
-        // 3. Analizeaza favoritele (weight: 3x)
         uniqueFavorites.forEach(fav => {
             if (fav.auction) {
                 const auction = fav.auction;
                 console.log("Processing favorite:", auction.title, auction.category);
                 
-                // Categoria
+                
                 const category = auction.category || 'unknown';
                 userProfile.categories.set(category, (userProfile.categories.get(category) || 0) + 3);
                 
-                // Conditia
+                
                 const condition = auction.condition || 'unknown';
                 userProfile.conditions.set(condition, (userProfile.conditions.get(condition) || 0) + 3);
                 
-                // Vanzatorul preferat
+                
                 if (auction.createdBy) {
                     userProfile.preferredSellers.add(auction.createdBy.toString());
                 }
                 
-                // Ora adaugarii la favorite
+                
                 const hour = new Date(fav.createdAt || Date.now()).getHours();
                 userProfile.activityHours.set(hour, (userProfile.activityHours.get(hour) || 0) + 1);
             }
         });
 
-        // 4. Analizeaza licitatiile utilizatorului (weight: 2x)
         userBids.forEach(bid => {
             if (bid.auctionItem) {
                 const auction = bid.auctionItem;
@@ -112,7 +106,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             }
         });
 
-        // 5. Analizeaza licitatiile castigate (weight: 4x)
         if (user?.wonAuctionsDetails) {
             user.wonAuctionsDetails.forEach(won => {
                 console.log("Processing won auction:", won.title);
@@ -129,7 +122,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             });
         }
 
-        // 6. Calculeaza statistici avansate
         userProfile.totalInteractions = Array.from(userProfile.categories.values())
             .reduce((sum, count) => sum + count, 0);
         
@@ -137,15 +129,13 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
         
         userProfile.averagePrice = userProfile.priceRanges.length > 0 
             ? userProfile.priceRanges.reduce((a, b) => a + b, 0) / userProfile.priceRanges.length 
-            : 100; // Valoare default
+            : 100; 
         
         userProfile.preferredTimeSlot = Array.from(userProfile.activityHours.entries())
             .sort((a, b) => b[1] - a[1])[0]?.[0] || 12;
 
-        // 7. Determina tipul de utilizator
         userProfile.userType = determineUserType(userProfile);
 
-        // 8. CALCULEAZa PREFERINtELE DE PREt - FOARTE IMPORTANT!
         const activityLevel = determineActivityLevel(userBids.length, user?.wonAuctionsDetails?.length || 0);
         const spendingPattern = determineSpendingPattern(user.moneySpent || 0, userProfile.priceRanges);
         const pricePreferences = calculatePersonalizedPriceRange(userProfile.priceRanges, spendingPattern);
@@ -162,12 +152,10 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             topCategories: Array.from(userProfile.categories.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3)
         });
 
-        // 9. Gaseste licitatii disponibile - EXCLUDE LICITAtIILE CasTIGATE
         const now = new Date();
         let availableAuctions = [];
         let searchStrategy = '';
 
-        // Obtine ID-urile licitatiilor castigate de utilizator (cu deduplicare)
         const wonAuctionIds = [...new Set(
             (user?.wonAuctionsDetails || [])
                 .map(won => won.auctionId?.toString())
@@ -175,7 +163,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
         )];
         console.log("Excluding won auctions:", wonAuctionIds.length, wonAuctionIds);
 
-        // DEBUGGING: Verifică formatul datelor
         const sampleAuction = await Auction.findOne({}).lean();
         console.log("Sample auction date format:", {
             startTime: sampleAuction?.startTime,
@@ -184,7 +171,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             endTimeType: typeof sampleAuction?.endTime
         });
 
-        // FIX: Convertește `now` la același format ca în baza de date
         const nowForComparison = typeof sampleAuction?.startTime === 'string' 
             ? now.toISOString() 
             : now;
@@ -194,7 +180,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             type: typeof nowForComparison
         });
 
-        // Strategie corectă pentru căutarea licitațiilor active
         const activeAuctions = await Auction.find({
             createdBy: { $ne: userId },
             _id: { $nin: wonAuctionIds },
@@ -240,7 +225,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
 
         console.log("Available auctions with strategy '" + searchStrategy + "' (excluding won):", availableAuctions.length);
 
-        // 10. Calculeaza scorurile personalizate
         const recommendations = [];
         let scoreDetails = [];
 
@@ -255,8 +239,7 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
                     reasons: score.reasons
                 });
 
-                // Pune un prag minim pentru recomandări de calitate
-                const MINIMUM_SCORE_THRESHOLD = 40; // Doar recomandări cu scor >= 15
+                const MINIMUM_SCORE_THRESHOLD = 40;
 
                 if (score.total >= MINIMUM_SCORE_THRESHOLD) {
                     recommendations.push({
@@ -343,7 +326,7 @@ function calculatePersonalizedPriceRange(priceRanges, spendingPattern) {
     const q3 = sortedPrices[Math.floor(sortedPrices.length * 0.75)];
     const iqr = q3 - q1;
     
-    // Ajusteaza intervalul in functie de pattern-ul de cheltuieli
+
     const expansion = spendingPattern === 'premium' ? 1.5 : spendingPattern === 'moderate' ? 1.2 : 0.8;
     
     return {
@@ -352,7 +335,6 @@ function calculatePersonalizedPriceRange(priceRanges, spendingPattern) {
     };
 }
 
-//Scoring
 function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
     let score = 0;
     const reasons = [];
@@ -360,12 +342,11 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
 
     console.log(`\nPersonalized scoring for "${auction.title}" (User: ${userProfile.userType})`);
 
-    // 1. CATEGORIA - (40% din scor)
+    // 1. CATEGORIA 
     const categoryInteractions = userProfile.categories.get(auction.category) || 0;
     const maxCategoryInteractions = Math.max(...Array.from(userProfile.categories.values()));
     
     if (categoryInteractions > 0) {
-        // Scor proportional cu interactiunile
         const categoryScore = (categoryInteractions / Math.max(maxCategoryInteractions, 1)) * 40;
         score += categoryScore;
         
@@ -389,7 +370,7 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
         }
     }
 
-    // 2. CONDITIA - (15% din scor)
+    // 2. CONDITIA 
     const conditionInteractions = userProfile.conditions.get(auction.condition) || 0;
     const maxConditionInteractions = Math.max(...Array.from(userProfile.conditions.values()));
     
@@ -443,27 +424,6 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
             reasons.push(`Above your usual spending pattern`);
         }
     }
-    // 4. VANZATORUL - (10% din scor)
-    if (userProfile.preferredSellers.has(auction.createdBy._id.toString())) {
-        score += 20;
-        reasons.push(`Trusted seller from your history`);
-        rank = 'highly_recommended';
-    } else if (auction.createdBy.averageRating >= 4.5) {
-        score += 8;
-        reasons.push(`Excellent seller (${auction.createdBy.averageRating}★)`);
-    } else if (auction.createdBy.averageRating >= 4.0) {
-        score += 5;
-        reasons.push(`Good seller (${auction.createdBy.averageRating}★)`);
-    }
-
-    // 5. TIMING PERSONAL (5% din scor)
-    const currentHour = new Date().getHours();
-    const userPreferredHour = userProfile.preferredTimeSlot;
-    
-    if (Math.abs(currentHour - userPreferredHour) <= 2) {
-        score += 5;
-        reasons.push(`Perfect timing - you're usually active now`);
-    }
 
     // 6. BONUS PENTRU TIPUL DE UTILIZATOR (5% din scor)
     switch (userProfile.userType) {
@@ -486,24 +446,18 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
             }
             break;
     }
-
-    // 7. SCOR FINAL ȘI RANKING
     score = Math.max(0, Math.round(score * 100) / 100);
     
-    // Ajustează ranking-ul cu praguri mai ridicate
     if (score >= 80) rank = 'must_see';
     else if (score >= 60) rank = 'highly_recommended';  
     else if (score >= 42) rank = 'recommended';
     else if (score >= 20) rank = 'maybe_interesting';
     else rank = 'not_recommended';
 
-    // ADAUGĂ PENALIZARE pentru scoruri foarte mici
     if (score < 10) {
-        score = 0; // Elimină complet recomandările foarte slabe
+        score = 0; 
         rank = 'not_recommended';
     }
-
-    console.log(`Personal score: ${score}, Rank: ${rank}`);
 
     return {
         total: score,
@@ -514,11 +468,8 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
     };
 }
 
-// Obtine recomandari simple bazate doar pe categoria licitatiei curente
 export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
     const { auctionId } = req.params;
-    
-    console.log('getSimilarAuctions called for:', auctionId);
     
     try {
         // Gaseste licitatia curenta
@@ -528,33 +479,18 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler("Auction not found", 404));
         }
         
-        console.log('Current auction:', {
-            id: auction._id,
-            title: auction.title,
-            category: auction.category,
-            condition: auction.condition,
-            startingBid: auction.startingBid,
-            endTime: auction.endTime,
-            startTime: auction.startTime
-        });
-        
         const now = new Date();
-        console.log('⏰ Current time:', now.toISOString());
         
         // STEP 1: Verifica toate licitatiile disponibile (pentru debugging)
         const allAuctions = await Auction.find({
             _id: { $ne: auctionId }
         }).select('title category condition startingBid endTime startTime').lean();
         
-        console.log('Total other auctions in database:', allAuctions.length);
-        
         // STEP 2: Licitatii din aceeasi categorie (fara restrictii de timp)
         const sameCategoryAuctions = await Auction.find({
             _id: { $ne: auctionId },
             category: auction.category
         }).select('title category condition startingBid endTime startTime').lean();
-        
-        console.log(`Auctions in "${auction.category}" category:`, sameCategoryAuctions.length);
         
         // STEP 3: Licitatii active din aceeasi categorie
         const activeSameCategoryAuctions = await Auction.find({
@@ -563,7 +499,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             endTime: { $gt: now }
         }).select('title category condition startingBid endTime startTime').lean();
         
-        console.log(`Active auctions in "${auction.category}":`, activeSameCategoryAuctions.length);
+        // console.log(`Active auctions in "${auction.category}":`, activeSameCategoryAuctions.length);
         
         // STEP 4: Strategie multipla pentru a gasi recomandari
         let similarAuctions = [];
@@ -616,7 +552,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             .lean();
         }
         
-        console.log(`Found ${similarAuctions.length} similar auctions using strategy: ${strategy}`);
+        // console.log(`Found ${similarAuctions.length} similar auctions using strategy: ${strategy}`);
         
         if (similarAuctions.length > 0) {
             console.log('Sample similar auctions:');
@@ -698,7 +634,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             })
             .slice(0, 8); // Limiteaza la 8 recomandari
         
-        console.log('Final similar auctions:', topSimilar.length);
+        // console.log('Final similar auctions:', topSimilar.length);
         
         if (topSimilar.length > 0) {
             console.log('Top recommendations:');
@@ -796,122 +732,7 @@ export const debugAuctions = catchAsyncErrors(async (req, res, next) => {
     }
 });
 
-//Modificare buildUserProfile sa colecteze mai multe date:
 
-// function buildUserProfile(user, favoriteAuctions, userBids) {
-//     console.log("Building detailed user profile...");
-    
-//     const userProfile = {
-//         categories: new Map(),
-//         conditions: new Map(),
-//         priceRanges: [],
-//         preferredSellers: new Set(),
-//         timePreferences: new Map(),
-//         brandPreferences: new Map(),
-//         activityHours: new Map(),
-//         searchPatterns: new Map(),
-//         locationPreferences: new Set(),
-//         lastActivityDate: null
-//     };
-
-//     // 1. ANALIZEAZa FAVORITELE (weight: 3x - foarte important)
-//     const uniqueFavorites = [...new Set(user.favoriteAuctions || [])];
-//     uniqueFavorites.forEach(favoriteId => {
-//         const auction = favoriteAuctions.find(a => a._id.toString() === favoriteId.toString());
-//         if (auction) {
-//             // Categoria
-//             userProfile.categories.set(auction.category, 
-//                 (userProfile.categories.get(auction.category) || 0) + 3);
-            
-//             // Conditia
-//             userProfile.conditions.set(auction.condition, 
-//                 (userProfile.conditions.get(auction.condition) || 0) + 3);
-            
-//             // Vanzatorul preferat
-//             userProfile.preferredSellers.add(auction.createdBy._id.toString());
-            
-//             // Ora adaugarii la favorite (pentru pattern-uri temporale)
-//             const hour = new Date().getHours();
-//             userProfile.activityHours.set(hour, 
-//                 (userProfile.activityHours.get(hour) || 0) + 1);
-//         }
-//     });
-
-//     // 2. ANALIZEAZa BID-URILE (weight: 2x)
-//     userBids.forEach(bid => {
-//         const auction = bid.auctionItem;
-        
-//         // Categoria
-//         userProfile.categories.set(auction.category, 
-//             (userProfile.categories.get(auction.category) || 0) + 2);
-        
-//         // Conditia
-//         userProfile.conditions.set(auction.condition, 
-//             (userProfile.conditions.get(auction.condition) || 0) + 2);
-        
-//         // Intervalul de pret
-//         userProfile.priceRanges.push(bid.amount);
-        
-//         // Vanzatorul
-//         if (bid.amount >= auction.startingBid * 1.2) { // Doar daca a licitat serios
-//             userProfile.preferredSellers.add(auction.createdBy._id.toString());
-//         }
-        
-//         // Pattern temporal
-//         const bidHour = new Date(bid.placedAt).getHours();
-//         userProfile.activityHours.set(bidHour, 
-//             (userProfile.activityHours.get(bidHour) || 0) + 1);
-        
-//         // Ultima activitate
-//         if (!userProfile.lastActivityDate || bid.placedAt > userProfile.lastActivityDate) {
-//             userProfile.lastActivityDate = bid.placedAt;
-//         }
-//     });
-
-//     // 3. ANALIZEAZa LICITAtIILE CasTIGATE (weight: 4x - cel mai important)
-//     (user?.wonAuctionsDetails || []).forEach(won => {
-//         // Categoria - cea mai importanta
-//         userProfile.categories.set(won.category || 'unknown', 
-//             (userProfile.categories.get(won.category || 'unknown') || 0) + 4);
-        
-//         // Pretul final platit
-//         userProfile.priceRanges.push(won.finalBid);
-        
-//         // Pattern de timp cand cumpara
-//         const winHour = new Date(won.wonAt).getHours();
-//         userProfile.activityHours.set(winHour, 
-//             (userProfile.activityHours.get(winHour) || 0) + 2);
-//     });
-
-//     // 4. CALCULEAZa STATISTICI AVANSATE
-//     userProfile.totalInteractions = Array.from(userProfile.categories.values())
-//         .reduce((sum, count) => sum + count, 0);
-    
-//     userProfile.diversityScore = userProfile.categories.size; // Cate categorii diferite
-    
-//     userProfile.averagePrice = userProfile.priceRanges.length > 0 
-//         ? userProfile.priceRanges.reduce((a, b) => a + b, 0) / userProfile.priceRanges.length 
-//         : 0;
-    
-//     userProfile.preferredTimeSlot = Array.from(userProfile.activityHours.entries())
-//         .sort((a, b) => b[1] - a[1])[0]?.[0] || 12;
-
-//     // 5. DETERMINa TIPUL DE UTILIZATOR
-//     userProfile.userType = determineUserType(userProfile);
-
-//     console.log("User profile built:", {
-//         totalInteractions: userProfile.totalInteractions,
-//         categoriesCount: userProfile.categories.size,
-//         diversityScore: userProfile.diversityScore,
-//         averagePrice: userProfile.averagePrice,
-//         userType: userProfile.userType,
-//         topCategories: Array.from(userProfile.categories.entries()).sort((a, b) => b[1] - a[1]).slice(0, 3)
-//     });
-
-//     return userProfile;
-// }
-
-// Noua functie pentru determinarea tipului de utilizator
 function determineUserType(userProfile) {
     const totalInteractions = userProfile.totalInteractions;
     const diversity = userProfile.diversityScore;
@@ -924,7 +745,3 @@ function determineUserType(userProfile) {
     if (avgPrice < 200) return 'bargain_hunter';
     return 'casual_user';
 }
-
-
-//Sistemul analizeaza comportamentul utilizatorului si ii ofera recomandari personalizate de licitatii pe baza da:
-//preferinte: favorite, bid-uri, won-uri

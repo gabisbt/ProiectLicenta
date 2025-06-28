@@ -27,7 +27,7 @@ export const addNewAuctionItem = catchAsyncErrors(async (req, res, next) => {
         startingBid,
         startTime,
         endTime,
-        buyNowPrice, // Adaugă aceasta pentru a prelua valoarea
+        buyNowPrice, 
     } = req.body;
 
     if (!title || !description || !category || !condition || !startingBid || !startTime || !endTime) {
@@ -42,7 +42,6 @@ export const addNewAuctionItem = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Auction starting time must be less than ending time", 400));
     }
 
-    // Verifică dacă buyNowPrice (dacă există) este mai mare decât startingBid
     if (buyNowPrice && parseFloat(buyNowPrice) <= parseFloat(startingBid)) {
         return next(new ErrorHandler("Buy Now price must be greater than Starting Bid", 400));
     }
@@ -108,8 +107,6 @@ export const getAuctionDetails = catchAsyncErrors(async (req, res, next) => {
     }
     const bidders = auctionItem.bids.sort((a, b) => b.amount - a.amount);
 
-//si aici
-
 const now = new Date();
     const startTime = new Date(auctionItem.startTime);
     const endTime = new Date(auctionItem.endTime);
@@ -117,8 +114,6 @@ const now = new Date();
     if (now >= startTime && now <= endTime) {
         auctionService.startAuctionTimer(auctionItem._id.toString());
     }
-
-//de aici
 
     res.status(200).json({
         success: true,
@@ -316,7 +311,6 @@ export const getAllAuctionsBySeller = catchAsyncErrors(async (req, res, next) =>
     }
     
     try {
-        // Găsește TOATE licitațiile vânzătorului
         const allAuctions = await Auction.find({ createdBy: sellerId })
             .populate("createdBy", "userName email profileImage")
             .sort({ createdAt: -1 });
@@ -325,7 +319,6 @@ export const getAllAuctionsBySeller = catchAsyncErrors(async (req, res, next) =>
         console.log("Current time:", currentTime.toISOString());
         console.log("Total auctions found:", allAuctions.length);
         
-        // Filtrează în JavaScript în loc de MongoDB
         let filteredAuctions = allAuctions;
         
         if (status === 'active') {
@@ -348,7 +341,6 @@ export const getAllAuctionsBySeller = catchAsyncErrors(async (req, res, next) =>
             console.log("Ended auctions after filter:", filteredAuctions.length);
         }
         
-        // Calculează statistici
         const stats = {
             total: allAuctions.length,
             active: 0,
@@ -365,7 +357,6 @@ export const getAllAuctionsBySeller = catchAsyncErrors(async (req, res, next) =>
             if (isEnded) stats.ended++;
         });
         
-        // Găsește informațiile vânzătorului
         const sellerInfo = allAuctions.length > 0 
             ? allAuctions[0].createdBy 
             : await User.findById(sellerId).select("userName email profileImage");

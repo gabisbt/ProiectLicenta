@@ -24,7 +24,6 @@ const Recommendations = () => {
   };
 
   const handleAuctionClick = (auctionId) => {
-    // console.log('Navigating to auction:', auctionId); // Pentru debugging
     navigate(`/auction/item/${auctionId}`);
   };
 
@@ -111,14 +110,11 @@ const Recommendations = () => {
                     e.preventDefault();
                     e.stopPropagation();
                     console.log(' Card clicked:', auction.title, auction._id);
-                    
-                    // Adaugă un timeout mic pentru a asigura că evenimentul se procesează
                     setTimeout(() => {
                       handleAuctionClick(auction._id, auction.title);
                     }, 10);
                   }}
                 >
-                  {/* Badge personalizat */}
                   {auction.personalizedRank && auction.personalizedRank <= 2 && (
                     <div className="absolute -top-2 -right-2 z-10 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
                       {getRankIcon(auction.recommendationReasons?.[0])}
@@ -126,14 +122,11 @@ const Recommendations = () => {
                     </div>
                   )}
                   
-                  {/* Scor de recomandare */}
                   <div className="absolute top-2 left-2 z-10 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
                     {Math.round(auction.recommendationScore)}% match
                   </div>
-                  
-                  {/* Înlocuiește Card cu o structură simplă pentru a evita conflicte */}
+                
                   <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    {/* Imagine */}
                     <div className="relative h-48 bg-gray-50 overflow-hidden">
                       {auction.image?.url ? (
                         <img
@@ -148,7 +141,7 @@ const Recommendations = () => {
                       )}
                     </div>
                     
-                    {/* Conținut */}
+
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-800 mb-2 line-clamp-2">
                         {auction.title}
@@ -170,11 +163,11 @@ const Recommendations = () => {
                     </div>
                   </div>
                   
-                  {/* Motivele recomandării */}
+
                   {auction.recommendationReasons && auction.recommendationReasons.length > 0 && (
                     <div className="mt-2 p-2 bg-white/50 rounded-lg">
                       <p className="text-xs text-gray-700 truncate">
-                        💡 {auction.recommendationReasons[0]}
+                         {auction.recommendationReasons[0]}
                       </p>
                     </div>
                   )}
@@ -189,7 +182,8 @@ const Recommendations = () => {
                 onClick={handleViewAllClick}
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] hover:from-[#009999] hover:to-[#00B3B3] shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105"
               >
-                Vezi toate recomandările personalizate
+                
+See all personalized recommendations
               </button>
             </div>
           )}

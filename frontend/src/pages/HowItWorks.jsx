@@ -72,7 +72,7 @@ const HowItWorks = () => {
                 <div className="inline-block mb-4 relative">
                     <div className="w-16 h-1 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] mx-auto mb-6 rounded-full"></div>
                     <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-4xl font-extrabold mb-4 md:text-5xl lg:text-6xl relative drop-shadow-lg">
-                        Discover How <span className="text-[#111]">SBTBid</span> Operates
+                        Discover How <span className="text-[#110fac]">RetroShop</span> Operates
                     </h1>
                     <div className="w-24 h-1 bg-gradient-to-r from-[#2bd6bf] to-[#00B3B3] mx-auto mt-6 rounded-full"></div>
                 </div>

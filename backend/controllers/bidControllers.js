@@ -96,34 +96,28 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
 
     console.log("Buy Now request received for auction:", auctionId);
 
-    // Verifica daca licitatia exista si este activa
     const auction = await Auction.findById(auctionId);
     if (!auction) {
         return next(new ErrorHandler("Auction not found", 404));
     }
 
-    // Verifica daca utilizatorul este creatorul licitatiei
     if (auction.createdBy.toString() === userId.toString()) {
         return next(new ErrorHandler("You cannot buy your own auction.", 403));
     }
 
-    // Verifică dacă licitația este activă
     const now = new Date();
     if (now < new Date(auction.startTime) || now > new Date(auction.endTime)) {
         return next(new ErrorHandler("Auction is not active", 400));
     }
 
-    // Verifică dacă există un preț "Buy Now"
     if (!auction.buyNowPrice) {
         return next(new ErrorHandler("This auction doesn't have a Buy Now option", 400));
     }
 
-    // Verifică dacă prețul curent nu depășește deja prețul Buy Now
     if (auction.currentBid >= auction.buyNowPrice) {
         return next(new ErrorHandler("Current bid already exceeds Buy Now price", 400));
     }
 
-    // Adaugă o nouă ofertă pentru Buy Now
     const bidderDetail = await User.findById(userId);
 
     const newBid = {
@@ -133,7 +127,6 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
         amount: auction.buyNowPrice
     };
 
-    // Creează și o intrare în colecția Bid pentru consistență
     await Bid.create({
         amount: auction.buyNowPrice,
         bidder: {
@@ -148,13 +141,11 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
     auction.currentBid = auction.buyNowPrice;
     auction.highestBidder = userId;
 
-    // Încheie licitația imediat
     auction.endTime = now;
     auction.boughtNow = true;
     auction.buyNowUser = userId;
     await auction.save();
 
-    // Adaugă licitația în lista licitațiilor câștigate ale utilizatorului
     await User.findByIdAndUpdate(
         userId,
         {
@@ -175,14 +166,12 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
         }
     );
 
-    // Actualizează statisticile utilizatorului
     if (bidderDetail) {
         bidderDetail.moneySpent = (bidderDetail.moneySpent || 0) + parseFloat(auction.buyNowPrice);
         bidderDetail.auctionsWon = (bidderDetail.auctionsWon || 0) + 1;
         await bidderDetail.save();
     }
 
-    // Calculează comisionul (5%)
     const commission = auction.buyNowPrice * 0.05;
     const seller = await User.findById(auction.createdBy);
     if (seller) {
@@ -190,7 +179,6 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
         await seller.save();
     }
 
-    // Emitem eveniment socket.io pentru notificarea tuturor utilizatorilor
     io.to(`auction:${auctionId}`).emit("auctionEnded", {
         auction,
         buyNow: true,
@@ -201,11 +189,9 @@ export const buyNowAuction = catchAsyncErrors(async (req, res, next) => {
         message: "Auction has ended - Item was purchased using Buy Now"
     });
 
-    // ADAUGĂ ACEASTĂ SECȚIUNE PENTRU EMAIL-URI:
     console.log('📧 PREPARING BUY NOW EMAILS...');
 
     try {
-        // Email pentru cumpărător
         const buyerSubject = `🎉 Purchase Confirmed: ${auction.title}`;
         const buyerMessage = `
 Dear ${bidderDetail.userName},

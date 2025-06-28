@@ -6,7 +6,6 @@ import bidReducer from "./slices/bidSlice";
 import superAdminReducer from "./slices/superAdminSlice";
 import favoriteReducer from "./slices/favoriteSlice";
 import recommendationReducer from "./slices/recommendationSlice";
-// import reviewReducer from "./slices/reviewSlice";
 
 export const store = configureStore({
     reducer: {
@@ -17,7 +16,6 @@ export const store = configureStore({
         superAdmin: superAdminReducer,
         favorites: favoriteReducer,
         recommendation: recommendationReducer,
-        // review: reviewReducer,
     },
 });
 

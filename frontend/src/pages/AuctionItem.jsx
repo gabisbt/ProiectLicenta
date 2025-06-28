@@ -95,26 +95,6 @@ const AuctionItem = () => {
       return;
     }
 
-    // // Verifică dacă utilizatorul este vânzătorul
-    // if (isUserSeller) {
-    //   toast.error("You cannot bid on your own auction!");
-    //   return;
-    // }
-
-    // // Întrebare de siguranță pentru confirmarea ofertei
-    // const currentHighestBid = bidders.length > 0 && bidders[0]?.amount 
-    //   ? bidders[0].amount 
-    //   : "none";
-      
-    // const confirmMessage = currentHighestBid !== "none" 
-    //   ? `Are you sure you want to place a bid of ${amount} RON?\n\nCurrent highest bid: ${currentHighestBid} RON\nYour bid: ${amount} RON\n\nThis action cannot be undone.`
-    //   : `Are you sure you want to place the first bid of ${amount} RON?\n\nStarting bid: ${startingBid} RON\nYour bid: ${amount} RON\n\nThis action cannot be undone.`;
-
-    // // Afișează întrebarea de confirmare
-    // if (!window.confirm(confirmMessage)) {
-    //   return; // Utilizatorul a anulat
-    // }
-
     setBidError("");
     const formData = new FormData();
     formData.append("amount", amount);
@@ -123,7 +103,7 @@ const AuctionItem = () => {
       .then((response) => {
         dispatch(getAuctionDetail(id));
         setAmount(0);
-        // toast.success(`Your bid of ${amount} RON has been placed successfully!`);
+
       })
       .catch((err) => {
         toast.error(err?.message || "Failed to place bid");
@@ -133,24 +113,19 @@ const AuctionItem = () => {
   //pentru sockets
   useEffect(() => {
     if (!socketConnected.current && id) {
-      // Eliminam verificarea de rol, astfel incat toti utilizatorii autentificati sa se poata conecta
       socket.connect();
       socketConnected.current = true;
 
-      // Alaturam utilizatorul in camera licitatiei
       socket.emit("joinAuction", id);
 
       if (user?._id) {
         socket.emit("authenticate", user._id);
       }
 
-      // Ascultam pentru actualizari de oferte
       socket.on("bidUpdate", (data) => {
         if (data.auctionId === id) {
-          // Reincarcam datele licitatiei pentru a reflecta noua oferta
           dispatch(getAuctionDetail(id));
 
-          // Mesaj diferit pentru vanzator vs. licitator
           if (user?.role === "Auctioneer" && user?._id === auctionDetail?.createdBy) {
             toast.info(`${data.bidderName} a plasat o oferta de ${data.bidAmount} RON pe licitatia ta`);
           } else {
@@ -372,13 +347,6 @@ const AuctionItem = () => {
   }, [auctionDetail, safeBidders, isAuthenticated, user]);
 
   const showBuyNowButton = () => {
-    // console.log("Buy Now debug:", {
-    //   isActive: isAuctionActive(),
-    //   price: auctionDetail?.buyNowPrice,
-    //   bidders: safeBidders
-    // });
-
-    // inlocuieste "return true" cu verificarea corecta
     return (
       isAuctionActive() &&
       auctionDetail?.buyNowPrice &&
@@ -393,10 +361,8 @@ const AuctionItem = () => {
       toast.warning("Only bidders can purchase items!");
       return;
     }
-
     if (window.confirm(`Are you sure you want to buy this item now for ${auctionDetail.buyNowPrice} RON?`)) {
       dispatch(buyNowAuction(id))
-        // inlocuieste .unwrap().then cu un simplu .then
         .then((response) => {
           if (response?.success) {
             toast.success("Item purchased successfully!");
@@ -894,86 +860,6 @@ const AuctionItem = () => {
         </div>
       )}
 
-      {/* {auctionDetail && !loading && user && user.role === "Bidder" && (
-        <div className="fixed top-24 right-4 bg-white p-2 z-50 text-sm border">
-          Data check: {auctionDetail.title}, {auctionBidders?.[0]?.amount || auctionDetail?.startingBid} RON
-        </div>
-      )} */}
-
-      {/* {isAuthenticated && auctionDetail && (
-        <>
-        
-          {user?.role === "Bidder" && 
-           user?._id !== auctionDetail.createdBy && 
-           auctionDetail.createdBy && (
-            <div className="fixed bottom-4 right-8 z-40">
-              <button
-                onClick={() => openChatWith(
-                  auctionDetail.createdBy,
-                  "Vânzător",
-                  null
-                )}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 shadow-lg"
-              >
-                <FaComment />
-                <span>Chat cu vânzătorul</span>
-              </button>
-            </div>
-          )} */}
-
-          
-          {/* {user?.role === "Auctioneer" && 
-           user?._id === auctionDetail.createdBy && 
-           safeBidders.length > 0 && (
-            <div className="fixed bottom-4 right-8 z-40 bg-white p-4 rounded-lg shadow-lg border max-w-sm">
-              <h4 className="font-semibold mb-2">Chat cu licitatorii:</h4>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {safeBidders.slice(0, 5).map((bidder) => (
-                  <button
-                    key={bidder.userId}
-                    onClick={() => openChatWith(
-                      bidder.userId,
-                      bidder.userName,
-                      bidder.profileImage
-                    )}
-                    className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors w-full text-left"
-                  >
-                    <div className="w-8 h-8 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] rounded-full flex items-center justify-center">
-                      {bidder.profileImage ? (
-                        <img
-                          src={bidder.profileImage}
-                          alt={bidder.userName}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <FaUser className="text-white text-xs" />
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium">{bidder.userName}</p>
-                      <p className="text-sm text-gray-600">
-                        Ultima ofertă: {bidder.amount} RON
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )} */}
-
-          
-          {/* {showChat && chatUser && (
-            <ChatModal
-              isOpen={showChat}
-              onClose={handleCloseChat}
-              auctionId={auctionDetail._id}
-              otherUser={chatUser}
-              auctionTitle={auctionDetail.title}
-            />
-          )}
-        </>
-      )} */}
-
       {/* Secțiunea informații vânzător - integrată în design */}
       {auctionDetail && !loading && (
         <div className="max-w-7xl mx-auto w-full mt-8 mb-8">
@@ -1012,7 +898,7 @@ const AuctionItem = () => {
                 
                 {/* Informații vânzător */}
                 <div className="flex-1">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center gap-3">
                       <div className="bg-[#00B3B3]/10 p-2 rounded-full">
                         <FaUser className="text-[#00B3B3]" />
@@ -1036,7 +922,7 @@ const AuctionItem = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                   
                   {/* Buton pentru a vedea toate licitațiile */}
                   <button 

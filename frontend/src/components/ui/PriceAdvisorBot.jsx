@@ -13,7 +13,6 @@ const PriceAdvisorBot = ({ auctionDetail, currentBid }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  //Mesaj de inceput
   useEffect(() => {
     const price = currentBid || auctionDetail?.currentBid || auctionDetail?.startingBid || '?';
     setMessages([{ 
@@ -40,7 +39,6 @@ Ce dorești să știi?`
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
     
-    // Adauga mesajul utilizatorului in chat
     setMessages([...messages, { sender: 'user', text: inputMessage }]);
     
     const userQuery = inputMessage;
@@ -48,10 +46,7 @@ Ce dorești să știi?`
     setIsLoading(true);
     
     try {
-      // Obtine token-ul din localStorage
       const token = localStorage.getItem('token');
-      
-      // Foloseste URL-ul relativ pentru a evita probleme CORS
       const response = await axios.post('/api/v1/price-advisor', 
         { 
           query: userQuery,
@@ -74,7 +69,6 @@ Ce dorești să știi?`
         setEvaluation(data.evaluation);
         setLastPriceRange(data.priceRange);
         
-        // Adauga raspunsul botului în chat
         setMessages(prev => [
           ...prev, 
           { 
@@ -119,7 +113,6 @@ Ce dorești să știi?`
     const price = currentBid || auctionDetail?.currentBid || auctionDetail?.startingBid || 0;
     const numericPrice = parseFloat(price);
     
-    // Calcul pozitia relativa a prețului curent pe scală
     const min = priceRange.low;
     const max = priceRange.high;
     const range = max - min;
@@ -136,12 +129,10 @@ Ce dorești să știi?`
           <span>Maxim: {priceRange.high} RON</span>
         </div>
         <div className="relative h-6 bg-gray-200 rounded-full overflow-hidden">
-          {/* Zonele de preț */}
           <div className="absolute top-0 left-0 h-full w-1/3 bg-green-200"></div>
           <div className="absolute top-0 left-[33%] h-full w-1/3 bg-yellow-200"></div>
           <div className="absolute top-0 left-[66%] h-full w-1/3 bg-red-200"></div>
           
-          {/* Marker pentru preț curent */}
           <div 
             className="absolute top-0 h-full w-1 bg-blue-600"
             style={{ left: `${position}%` }}
@@ -164,7 +155,6 @@ Ce dorești să știi?`
 
   return (
     <>
-      {/* Buton pentru deschiderea chatbot-ului */}
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
@@ -184,7 +174,6 @@ Ce dorești să știi?`
         </div>
       </button>
 
-      {/* Chatbot modal */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -194,7 +183,6 @@ Ce dorești să știi?`
             transition={{ duration: 0.3 }}
             className="fixed bottom-0 right-0 z-50 w-full sm:w-96 h-[500px] bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl sm:bottom-6 sm:right-6 overflow-hidden border border-gray-200 flex flex-col"
           >
-            {/* Header */}
             <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] p-4 flex justify-between items-center text-white">
               <div className="flex items-center">
                 <FaRobot className="text-2xl mr-3" />
@@ -211,8 +199,6 @@ Ce dorești să știi?`
                 <FaTimes />
               </button>
             </div>
-            
-            {/* Messages container */}
             <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
               {messages.map((msg, idx) => (
                 <div 
@@ -248,7 +234,6 @@ Ce dorești să știi?`
               <div ref={messagesEndRef} />
             </div>
             
-            {/* Suggested questions */}
             {messages.length <= 2 && (
               <div className="px-4 py-2 bg-white border-t border-gray-100">
                 <p className="text-xs text-gray-500 mb-2 flex items-center">
@@ -271,7 +256,6 @@ Ce dorești să știi?`
               </div>
             )}
             
-            {/* Input */}
             <div className="p-3 border-t border-gray-200 bg-white">
               <div className="flex items-center bg-gray-100 rounded-full px-4 py-1">
                 <input

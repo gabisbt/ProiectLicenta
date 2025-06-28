@@ -3,25 +3,12 @@ import jwt from 'jsonwebtoken';
 import ErrorHandler from './error.js';
 import {catchAsyncErrors} from "../middlewares/catchAsyncErrors.js";
 
-//pt logare cu token basic
-// export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-//     const token = req.cookies.token;
-//     if (!token){
-//         return next(new ErrorHandler("User not authenticated", 400));
-//     }
-//     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-//     req.user = await User.findById(decoded.id);
-//     next();
-// });
-
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
     let token;
     
-    // Verifica daca exista token in cookies
     if (req.cookies.token) {
       token = req.cookies.token;
     } 
-    // Verifica și header-ul Authorization daca nu exista in cookies
     else if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }

@@ -191,7 +191,7 @@ const UserProfile = () => {
                   </p>
                 </div>
 
-                <div className="ml-auto">
+                {/* <div className="ml-auto">
                   <button
                     className={`py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md ${
                       isEditing
@@ -210,7 +210,7 @@ const UserProfile = () => {
                       </>
                     )}
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <div className="mb-8">
