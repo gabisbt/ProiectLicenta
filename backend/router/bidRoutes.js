@@ -1,6 +1,5 @@
 import express from "express";
 import { placeBid } from '../controllers/bidControllers.js';
-// import { buyNowAuction } from '../controllers/auctionItemController.js'; 
 import { isAuthenticated, isAuthorized} from "../middlewares/auth.js";
 import { checkAuctionEndTime } from "../middlewares/checkAuctionEndTime.js";
 import { buyNowAuction } from "../controllers/bidControllers.js"; 

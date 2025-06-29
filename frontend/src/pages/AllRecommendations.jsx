@@ -36,7 +36,6 @@ const AllRecommendations = () => {
         item?.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
-      // Sortare
       filtered = filtered.sort((a, b) => {
         switch (sortBy) {
           case "score":
@@ -61,7 +60,6 @@ const AllRecommendations = () => {
   return (
     <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] pb-10 flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa]">
       <div className="max-w-7xl mx-auto w-full">
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={() => navigate(-1)}
@@ -79,7 +77,6 @@ const AllRecommendations = () => {
           </div>
         </div>
 
-        {/* Profilul utilizatorului */}
         {userProfile && (
           <div className="bg-white/20 backdrop-blur-sm rounded-lg p-6 mb-8">
             <div className="flex flex-wrap items-center gap-6 text-sm text-[#134e5e]">
@@ -101,7 +98,6 @@ const AllRecommendations = () => {
           </div>
         )}
 
-        {/* Filtre si cautare */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <input
@@ -128,7 +124,6 @@ const AllRecommendations = () => {
           </div>
         </div>
 
-        {/* Lista de recomandari */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00B3B3]"></div>
@@ -159,7 +154,6 @@ const AllRecommendations = () => {
                       currentBid={auction.currentBid}
                     />
 
-                    {/* Motivele recomandarii */}
                     {auction.recommendationReasons && auction.recommendationReasons.length > 0 && (
                       <div className="mt-2 p-3 bg-white/80 rounded-lg border border-gray-100">
                         <p className="text-sm text-gray-700 font-medium mb-1">

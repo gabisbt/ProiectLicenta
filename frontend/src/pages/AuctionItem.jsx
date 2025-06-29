@@ -31,7 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import PriceAdvisorBot from "@/components/ui/PriceAdvisorBot";
-// import ChatModal from '@/components/ui/ChatModal';
+
 import SimilarAuctions from "../components/ui/SimilarAuctions";
 
 const AuctionItem = () => {
@@ -49,13 +49,9 @@ const AuctionItem = () => {
   const [amount, setAmount] = useState(0);
   const [bidError, setBidError] = useState("");
 
-  // const [showChat, setShowChat] = useState(false);
-  // const [chatUser, setChatUser] = useState(null);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Adauga o functie pentru a verifica daca utilizatorul este vanzator
   const isUserSeller = user?._id === auctionDetail?.createdBy;
 
   useEffect(() => {
@@ -71,16 +67,14 @@ const AuctionItem = () => {
     }
     
     if (id) {
-      // Reset starea componentei când se schimbă ID-ul
       setIsLoaded(false);
       setAmount(0);
       setBidError("");
       setRealTimeRemaining("");
       
-      // Încarcă datele pentru noua licitație
       dispatch(getAuctionDetail(id));
     }
-  }, [isAuthenticated, id]); // Adaugă 'id' în dependențe!
+  }, [isAuthenticated, id]); 
 
   const handleBid = () => {
     const bidders = Array.isArray(auctionBidders) ? auctionBidders : [];
@@ -110,7 +104,6 @@ const AuctionItem = () => {
       });
   };
 
-  //pentru sockets
   useEffect(() => {
     if (!socketConnected.current && id) {
       socket.connect();
@@ -134,14 +127,12 @@ const AuctionItem = () => {
         }
       });
 
-      // Ascultam pentru actualizari de timp
       socket.on("timeUpdate", (data) => {
         if (data.auctionId === id) {
           setRealTimeRemaining(data.formattedTime);
         }
       });
 
-      // Ascultam pentru evenimentul de incheiere a licitatiei
       socket.on("auctionEnded", (data) => {
         if (data.auctionId === id) {
           dispatch(getAuctionDetail(id));
@@ -159,7 +150,6 @@ const AuctionItem = () => {
         }
       });
 
-      // Curatare la demontarea componentei
       return () => {
         socket.emit("leaveAuction", id);
         socket.off("bidUpdate");
@@ -224,12 +214,10 @@ const AuctionItem = () => {
   };
 
   const getTimeRemaining = () => {
-    // Daca avem timpul real de la server, il folosim
     if (realTimeRemaining) {
       return realTimeRemaining;
     }
 
-    // Altfel, folosim calculul local (codul tau original)
     if (!auctionDetail?.endTime) return "Time not available";
 
     try {
@@ -332,17 +320,6 @@ const AuctionItem = () => {
   const safeBidders = Array.isArray(auctionBidders) ? auctionBidders : [];
   useEffect(() => {
     if (auctionDetail) {
-      // Buy Now Button Debug:
-      // console.log("Buy Now Button Debug:", {
-      //   isActive: isAuctionActive(),
-      //   buyNowPrice: !!auctionDetail?.buyNowPrice,
-      //   buyNowPriceValue: auctionDetail?.buyNowPrice,
-      //   validBidCondition: (!safeBidders.length ||
-      //     parseFloat(safeBidders[0]?.amount || 0) < parseFloat(auctionDetail?.buyNowPrice || 0)),
-      //   isAuthenticated: isAuthenticated,
-      //   userRole: user?.role,
-      //   shouldShow: showBuyNowButton() && isAuthenticated && user?.role === "Bidder"
-      // });
     }
   }, [auctionDetail, safeBidders, isAuthenticated, user]);
 
@@ -375,32 +352,6 @@ const AuctionItem = () => {
     }
   };
 
-  // // Funcție îmbunătățită pentru deschiderea chat-ului
-  // const openChatWith = (userId, userName, profileImage) => {
-  //   // Verifică că avem toate datele necesare
-  //   if (!userId || !userName) {
-  //     console.error('Invalid chat user data:', { userId, userName, profileImage });
-  //     toast.error('Nu pot deschide chat-ul. Date utilizator invalide.');
-  //     return;
-  //   }
-
-  //   // Setează utilizatorul pentru chat
-  //   setChatUser({ 
-  //     _id: userId, 
-  //     userName, 
-  //     profileImage: profileImage || null 
-  //   });
-    
-  //   // Deschide chat-ul doar după ce datele sunt setate
-  //   setShowChat(true);
-  // };
-
-  // // Funcție pentru închiderea chat-ului
-  // const handleCloseChat = () => {
-  //   setShowChat(false);
-  //   // Resetează chatUser după o mică întârziere pentru a permite animației să se termine
-  //   setTimeout(() => setChatUser(null), 300);
-  // };
 
   return (
     <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden pb-10">
@@ -815,7 +766,6 @@ const AuctionItem = () => {
                 </div>
               </div>
 
-              {/* Purchased with Buy Now notification */}
               {getAuctionStatus() === "ended" && auctionDetail?.boughtNow && (
                 <div className="bg-green-50 border border-green-200 px-4 py-3 rounded-xl mb-8 shadow-sm">
                   <div className="flex items-center gap-2">
@@ -831,7 +781,6 @@ const AuctionItem = () => {
         )}
       </div>
 
-      {/* Zona de recomandări similare - apare doar după ce utilizatorul a văzut licitația */}
       {auctionDetail && !loading && isAuthenticated && user?.role === "Bidder" && (
         <SimilarAuctions 
           currentAuctionId={auctionDetail._id}
@@ -841,14 +790,12 @@ const AuctionItem = () => {
 
       {auctionDetail && !loading && (
         <div>
-          {/* Debug info - remove in production */}
           {user ? (
             <div className="hidden">User role: {user.role}</div>
           ) : (
             <div className="hidden">User not loaded</div>
           )}
 
-          {/* Actual chatbot that only displays for Bidders on active or upcoming auctions */}
           {user &&
             user.role === "Bidder" &&
             getAuctionStatus() !== "ended" && (
@@ -860,7 +807,6 @@ const AuctionItem = () => {
         </div>
       )}
 
-      {/* Secțiunea informații vânzător - integrată în design */}
       {auctionDetail && !loading && (
         <div className="max-w-7xl mx-auto w-full mt-8 mb-8">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 relative overflow-hidden">
@@ -875,7 +821,6 @@ const AuctionItem = () => {
               </div>
               
               <div className="flex flex-col md:flex-row gap-6 items-start">
-                {/* Avatar vânzător */}
                 <div className="w-20 h-20 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
                   {auctionDetail.createdBy?.profileImage?.url ? (
                     <img 
@@ -896,35 +841,8 @@ const AuctionItem = () => {
                   </div>
                 </div>
                 
-                {/* Informații vânzător */}
                 <div className="flex-1">
-                  {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-[#00B3B3]/10 p-2 rounded-full">
-                        <FaUser className="text-[#00B3B3]" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Seller's name</div>
-                        <div className="font-semibold text-[#134e5e] text-lg">
-                          {auctionDetail.createdBy?.userName || 'Nume indisponibil'}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="bg-[#00B3B3]/10 p-2 rounded-full">
-                        <FaInfoCircle className="text-[#00B3B3]" />
-                      </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Email contact</div>
-                        <div className="font-semibold text-[#134e5e] text-lg">
-                          {auctionDetail.createdBy?.email || 'Email indisponibil'}
-                        </div>
-                      </div>
-                    </div>
-                  </div> */}
                   
-                  {/* Buton pentru a vedea toate licitațiile */}
                   <button 
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white px-6 py-3 rounded-xl hover:from-[#009999] hover:to-[#1fb8a8] transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
                     onClick={() => {

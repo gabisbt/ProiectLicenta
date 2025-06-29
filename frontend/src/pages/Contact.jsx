@@ -80,12 +80,8 @@ const Contact = () => {
 
   return (
     <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden">
-      {/* Background Elements */}
-      {/* <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div> */}
 
       <div className={`max-w-7xl mx-auto w-full flex flex-col lg:flex-row gap-12 transform transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-        {/* Contact Info Column */}
         <div className="w-full lg:w-1/3 mb-8 lg:mb-0">
           <div className="sticky top-28">
             <div className="flex flex-col gap-6">
@@ -114,10 +110,8 @@ const Contact = () => {
           </div>
         </div>
 
-        {/* Contact Form Column */}
         <div className="w-full lg:w-2/3">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/50 relative overflow-hidden">
-            {/* Decorative Elements */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-r from-[#2bd6bf]/10 to-[#00B3B3]/10 rounded-full blur-xl"></div>
 
@@ -131,7 +125,7 @@ const Contact = () => {
                 onSubmit={handleContactForm}
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Name */}
+
                   <div className="flex flex-col gap-2 group">
                     <label className="text-lg text-gray-600 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
                       <FaUser className="text-[#00B3B3]" /> Your Name
@@ -146,7 +140,6 @@ const Contact = () => {
                     />
                   </div>
 
-                  {/* Email */}
                   <div className="flex flex-col gap-2 group">
                     <label className="text-lg text-gray-600 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
                       <FaEnvelope className="text-[#00B3B3]" /> Your Email
@@ -163,7 +156,6 @@ const Contact = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Phone */}
                   <div className="flex flex-col gap-2 group">
                     <label className="text-lg text-gray-600 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
                       <FaPhone className="text-[#00B3B3]" /> Your Phone
@@ -178,7 +170,6 @@ const Contact = () => {
                     />
                   </div>
 
-                  {/* Subject */}
                   <div className="flex flex-col gap-2 group">
                     <label className="text-lg text-gray-600 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
                       <FaPen className="text-[#00B3B3]" /> Subject
@@ -194,7 +185,6 @@ const Contact = () => {
                   </div>
                 </div>
 
-                {/* Message */}
                 <div className="flex flex-col gap-2 group">
                   <label className="text-lg text-gray-600 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
                     <FaCommentDots className="text-[#00B3B3]" /> Message
@@ -208,8 +198,6 @@ const Contact = () => {
                     placeholder="Please provide details about your inquiry..."
                   />
                 </div>
-
-                {/* Submit Button */}
                 <button
                   className="relative overflow-hidden bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] hover:from-[#2bd6bf] hover:to-[#00B3B3] text-white font-semibold text-xl py-4 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-[1.02] flex items-center justify-center gap-3 w-full sm:w-auto mx-auto mt-4"
                   type="submit"

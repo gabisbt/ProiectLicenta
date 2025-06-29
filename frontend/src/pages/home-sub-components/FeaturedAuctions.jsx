@@ -13,7 +13,7 @@ const FeaturedAuctions = ({ allAuctions }) => {
                     key={element._id}
                     className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                 >
-                    {/* Auction Image */}
+                   
                     <div className="relative">
                         <img
                             src={element.image?.url || "https://via.placeholder.com/400x300"}
@@ -25,7 +25,7 @@ const FeaturedAuctions = ({ allAuctions }) => {
                         </div>
                     </div>
 
-                    {/* Auction Details */}
+            
                     <div className="p-6">
                         <h4 className="text-xl font-bold text-[#1A202C] mb-2">
                             {element.title}

@@ -191,26 +191,6 @@ const UserProfile = () => {
                   </p>
                 </div>
 
-                {/* <div className="ml-auto">
-                  <button
-                    className={`py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2 shadow-md ${
-                      isEditing
-                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-lg"
-                        : "bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white hover:shadow-lg"
-                    }`}
-                    onClick={isEditing ? handleSaveChanges : handleEditToggle}
-                  >
-                    {isEditing ? (
-                      <>
-                        <FaSave /> Save Changes
-                      </>
-                    ) : (
-                      <>
-                        <FaEdit /> Edit Profile
-                      </>
-                    )}
-                  </button>
-                </div> */}
               </div>
 
               <div className="mb-8">

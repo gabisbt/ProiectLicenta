@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-// Thunk pentru obtinerea comisionului neplatit
 export const getUnpaidCommission = createAsyncThunk(
     "commission/getUnpaidCommission",
     async (_, { rejectWithValue }) => {
@@ -20,7 +19,6 @@ export const getUnpaidCommission = createAsyncThunk(
     }
 );
 
-// Slice pentru gestionarea comisionului
 const commissionSlice = createSlice({
     name: "commission",
     initialState: {
@@ -57,7 +55,6 @@ const commissionSlice = createSlice({
     }
 });
 
-// Thunk pentru incarcarea dovezii de plată
 export const postCommissionProof = (data) => async (dispatch) => {
     dispatch(commissionSlice.actions.postCommissionProofRequest());
     try {

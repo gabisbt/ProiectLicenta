@@ -43,14 +43,12 @@ export const endedAuctionCron = () => {
                         const bidder = await User.findById(highestBidder.bidder.id);
                         
                         if (bidder) {
-                            // Verifica daca licitatia exista deja in WonAuctionsDetails
                             const alreadyWon = await User.findOne({
                                 _id: bidder._id,
                                 'wonAuctionsDetails.auctionId': auction._id
                             });
 
                             if (!alreadyWon) {
-                                // Actualizeaza statisticile castigatorului
                                 await User.findByIdAndUpdate(
                                     bidder._id,
                                     {
@@ -77,7 +75,6 @@ export const endedAuctionCron = () => {
                                 console.log(`Auction already processed for bidder: ${bidder.userName}`);
                             }
 
-                            // Actualizează comisionul vanzatorului
                             await User.findByIdAndUpdate(
                                 auctioneer._id,
                                 {
@@ -88,7 +85,6 @@ export const endedAuctionCron = () => {
                                 { new: true }
                             );
 
-                            // Trimite email-ul 
                             const subject = `Congratulations! You won the auction for ${auction.title}`;
                             const message = `Dear ${bidder.userName},\n\nCongratulations! You have won the auction for "${auction.title}" with a bid of ${highestBidder.amount} RON.\n\n` +
                                 `Before proceeding with payment, please contact your seller via email: ${auctioneer.email}\n\n` +

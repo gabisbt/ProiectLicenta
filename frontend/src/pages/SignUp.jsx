@@ -66,9 +66,6 @@ const SignUp = () => {
     return (
         <>
             <section className="w-full h-auto px-5 pt-20 pb-10 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden">
-                {/* Background Elements */}
-                {/* <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div> */}
 
                 <div className={`max-w-4xl mx-auto w-full transform transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                     <div className="text-center mb-8">
@@ -85,7 +82,7 @@ const SignUp = () => {
                     <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/50 relative overflow-hidden">
 
                         <form className="relative z-10 flex flex-col gap-8" onSubmit={handleRegister}>
-                            {/* Personal Details Section */}
+
                             <div>
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">
@@ -211,7 +208,6 @@ const SignUp = () => {
                                 </div>
                             </div>
 
-                            {/* Payment Method Section */}
                             <div className={`transition-all duration-500 ${role === "Auctioneer" ? "opacity-100" : "opacity-50"}`}>
                                 <div className="flex items-center gap-3 mb-6">
                                     <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">

@@ -89,16 +89,12 @@ export const register = catchAsyncErrors(async(req, res, next) => {
     
     });
     generateToken(user, "User registered successfully", 201, res);
-    // res.status(201).json({
-    //     success: true,
-    //     message: "User registered successfully."
-    // }); 
 });
 
 export const login = catchAsyncErrors(async(req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return next(new ErrorHandler("Please enter email and password."));              //aici e posibil sa fie 400
+        return next(new ErrorHandler("Please enter email and password."));              
     }
     const user = await User.findOne({email}).select("+password");
     if (!user) {
@@ -154,15 +150,15 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("User not found with this email.", 404));
     }
 
-    // Generează un token de resetare
+    // Genereaza un token de resetare
     const resetToken = crypto.randomBytes(32).toString("hex");
 
-    // Hash token-ul și setează-l în baza de date
+    // Hash token-ul si setare in baza de date
     user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // Token valabil 10 minute
     await user.save({ validateBeforeSave: false });
 
-    // Creează link-ul de resetare
+    // Creeaza link-ul de resetare
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     const message = `You requested a password reset. Click the link below to reset your password:\n\n${resetUrl}\n\nIf you did not request this, please ignore this email.`;
@@ -179,7 +175,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
             message: "Reset link sent to your email.",
         });
     } catch (error) {
-        console.error("Error sending email:", error); // Adaugă acest log
+        console.error("Error sending email:", error); 
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
         await user.save({ validateBeforeSave: false });
@@ -199,19 +195,19 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Please provide a new password.", 400));
     }
 
-    // Hash token-ul și caută utilizatorul
+    // Hash token-ul si cautarea utilizatorului
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     const user = await User.findOne({
         resetPasswordToken: hashedToken,
-        resetPasswordExpire: { $gt: Date.now() }, // Verifică dacă token-ul nu a expirat
+        resetPasswordExpire: { $gt: Date.now() }, 
     });
 
     if (!user) {
         return next(new ErrorHandler("Invalid or expired reset token.", 400));
     }
 
-    // Actualizează parola
+    // Actualizeaza parola
     user.password = password;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;

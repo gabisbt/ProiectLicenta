@@ -13,12 +13,10 @@ const SubmitCommission = () => {
     const dispatch = useDispatch();
     const { unpaidCommission, loading } = useSelector((state) => state.commission);
 
-    // Animatie
     useEffect(() => {
         setIsLoaded(true);
     }, []);
 
-    // Obtine comisionul neplatit la montarea componentei
     useEffect(() => {
         dispatch(getUnpaidCommission());
     }, [dispatch]);
@@ -27,7 +25,6 @@ const SubmitCommission = () => {
         const file = e.target.files[0];
         if (file) {
             setProof(file);
-            // Create preview URL
             const fileReader = new FileReader();
             fileReader.onload = () => {
                 setPreviewUrl(fileReader.result);
@@ -47,9 +44,6 @@ const SubmitCommission = () => {
 
     return (
         <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden">
-            {/* Background Elements */}
-            {/* <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div> */}
 
             <div className={`max-w-4xl mx-auto w-full transform transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                 {/* Header */}
@@ -65,11 +59,7 @@ const SubmitCommission = () => {
                 </div>
 
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/50 relative overflow-hidden">
-                    {/* Decorative elements
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
-                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-r from-[#2bd6bf]/10 to-[#00B3B3]/10 rounded-full blur-xl"></div> */}
 
-                    {/* Commission information */}
                     <div className="relative z-10 mb-8 bg-gradient-to-r from-[#00B3B3]/5 to-[#2bd6bf]/5 rounded-xl p-6 border border-[#00B3B3]/10">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">
@@ -96,7 +86,7 @@ const SubmitCommission = () => {
                         </div>
                     </div>
 
-                    {/* Form */}
+
                     <form className="relative z-10 flex flex-col gap-6" onSubmit={handlePaymentProof}>
                         <div className="flex flex-col gap-2 group">
                             <label className="text-gray-700 flex items-center gap-2 group-focus-within:text-[#00B3B3] transition-colors duration-300">
@@ -130,7 +120,6 @@ const SubmitCommission = () => {
                                     />
                                 </label>
 
-                                {/* Preview container */}
                                 {previewUrl && (
                                     <div className="w-32 h-32 border-2 border-[#00B3B3]/30 rounded-lg overflow-hidden flex-shrink-0">
                                         <img
@@ -171,7 +160,7 @@ const SubmitCommission = () => {
                     </form>
                 </div>
 
-                {/* Note */}
+
                 <div className="mt-6 p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30 text-center text-gray-600 text-sm">
                     <p>Note: Your payment proof will be reviewed by our team. You will be notified once it's approved.</p>
                 </div>

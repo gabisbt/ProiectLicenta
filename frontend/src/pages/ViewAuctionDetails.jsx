@@ -74,7 +74,6 @@ const ViewAuctionDetails = () => {
   };
 
   const getAuctionStatus = () => {
-    // Verifica mai intai daca auctionDetail și proprietatile sale sunt disponibile
     if (!auctionDetail || !auctionDetail.startTime || !auctionDetail.endTime) {
       return "unknown";
     }
@@ -84,7 +83,6 @@ const ViewAuctionDetails = () => {
       const startTime = new Date(auctionDetail.startTime);
       const endTime = new Date(auctionDetail.endTime);
 
-      // Verifica daca datele sunt valide
       if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
         return "unknown";
       }
@@ -106,7 +104,6 @@ const ViewAuctionDetails = () => {
     <>
       <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden pb-10">
         <div className={`max-w-7xl mx-auto w-full transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          {/* Breadcrumb */}
           <div className="flex flex-wrap gap-2 items-center mb-6 bg-white/50 backdrop-blur-sm rounded-lg px-4 py-3 shadow-sm">
             <Link
               to="/"
@@ -131,13 +128,11 @@ const ViewAuctionDetails = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-              {/* Left Column - Auction Details */}
               <div className="xl:col-span-2">
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 relative overflow-hidden mb-8">
-                  {/* Decorative elements */}
+
                   <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
 
-                  {/* Auction Header */}
                   <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8 relative z-10">
                     <div className="w-full md:w-60 h-60 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-md overflow-hidden border border-gray-100 flex items-center justify-center p-2">
                       {auctionDetail.image?.url ? (
@@ -197,8 +192,6 @@ const ViewAuctionDetails = () => {
                           </div>
                         </div>
                       </div>
-
-                      {/* Status Badge */}
                       {auctionDetail.startTime && auctionDetail.endTime && (
                         <div className="mt-6">
                           {getAuctionStatus() === "upcoming" && (
@@ -220,8 +213,6 @@ const ViewAuctionDetails = () => {
                       )}
                     </div>
                   </div>
-
-                  {/* Description */}
                   <div className="relative z-10 mb-4">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">
@@ -250,17 +241,14 @@ const ViewAuctionDetails = () => {
                 </div>
               </div>
 
-              {/* Right Column - Bidders */}
               <div className="xl:col-span-1">
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl border border-white/50 relative mb-8">
-                  {/* Header */}
                   <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] p-4">
                     <h2 className="text-white font-semibold text-xl flex items-center gap-2">
                       <FaGavel /> Bidders
                     </h2>
                   </div>
 
-                  {/* Bidder List */}
                   <div className="p-4 max-h-[600px] overflow-y-auto">
                     {auctionBidders && auctionBidders.length > 0 &&
                       new Date(auctionDetail.startTime) < Date.now() &&

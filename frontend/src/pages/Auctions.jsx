@@ -13,30 +13,24 @@ const Auctions = () => {
     const [filteredAuctions, setFilteredAuctions] = useState([]);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Categorii
     const categories = ["All", "Electronics", "Furniture", "Art & Antiques", "Jewelry & Watches", 
                         "Automobiles", "Real Estate", "Collectibles", "Fashion & Accessories", 
                         "Sports Memorabilia", "Books & Manuscripts"];
 
     useEffect(() => {
-        // Aplicarea filtrelor si sortarii
         let results = [...allAuctions];
-        
-        // Filtrarea dupa termenul de cautare
         if (searchTerm) {
             results = results.filter(auction => 
                 auction.title.toLowerCase().includes(searchTerm.toLowerCase())
             );
         }
-        
-        // Filtrarea dupa categorie
+
         if (categoryFilter && categoryFilter !== "All") {
             results = results.filter(auction => 
                 auction.category === categoryFilter
             );
         }
-        
-        // Sortarea rezultatelor
+
         results.sort((a, b) => {
             let aValue, bValue;
             
@@ -77,9 +71,6 @@ const Auctions = () => {
             </div>
         ) : (
             <article className="w-full ml-0 m-0 min-h-screen px-5 pt-20 lg:pl-[320px] flex flex-col bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden">
-                {/* Background elements */}
-                {/* <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div> */}
                 
                 <div className={`max-w-7xl mx-auto w-full transition-all duration-1000 pb-20 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                     <div className="text-center mb-8">
@@ -93,10 +84,8 @@ const Auctions = () => {
                         </p>
                     </div>
 
-                    {/* Filters and search */}
                     <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 mb-8 shadow-lg border border-white/50">
                         <div className="flex flex-col lg:flex-row gap-4 items-center">
-                            {/* Search */}
                             <div className="relative w-full lg:w-1/3">
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <FaSearch className="text-gray-400" />
@@ -110,7 +99,7 @@ const Auctions = () => {
                                 />
                             </div>
 
-                            {/* Category filter */}
+                          
                             <div className="relative w-full lg:w-1/4">
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                     <FaFilter className="text-gray-400" />
@@ -126,7 +115,6 @@ const Auctions = () => {
                                 </select>
                             </div>
 
-                            {/* Sort options */}
                             <div className="flex items-center gap-3 w-full lg:w-auto">
                                 <select
                                     value={sortBy}
@@ -152,14 +140,14 @@ const Auctions = () => {
                         </div>
                     </div>
 
-                    {/* Results count */}
+                
                     <div className="flex justify-between items-center mb-6">
                         <p className="text-gray-600">
                             Showing <span className="font-semibold text-[#00B3B3]">{filteredAuctions.length}</span> {filteredAuctions.length === 1 ? 'auction' : 'auctions'}
                         </p>
                     </div>
 
-                    {/* Auctions grid */}
+                    
                     {filteredAuctions.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {filteredAuctions.map((element) => (

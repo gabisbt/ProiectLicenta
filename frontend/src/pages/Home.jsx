@@ -36,9 +36,7 @@ const Home = () => {
 
     return (
         <>
-            {/* Hero Section */}
             <section className="w-full h-screen flex flex-col justify-center items-center relative overflow-hidden lg:pl-[320px]">
-                {/* Fundalul */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#134e5e] via-[#2bd6bf] to-[#71b280] opacity-90 z-0"></div>
 
                 <div className="absolute inset-0 z-0 overflow-hidden">
@@ -47,7 +45,6 @@ const Home = () => {
                     <div className="absolute top-3/4 left-1/3 w-64 h-64 bg-[#00BFA6] opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
                 </div>
 
-                {/* Main Content */}
                 <div className={`relative z-10 mx-auto max-w-4xl bg-white/10 backdrop-blur-lg rounded-2xl p-10 border border-white/20 shadow-2xl transform transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
                     <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/30 to-transparent rounded-2xl opacity-50 z-0"></div>
 
@@ -85,7 +82,6 @@ const Home = () => {
                     </div>
                 </div>
 
-                {/*Scroll Down Button */}
                 <div
                     className={`absolute bottom-10 left-[60%] transform -translate-x-1/2 cursor-pointer z-10 transition-all duration-1000 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                     onClick={scrollToSection}
@@ -103,7 +99,6 @@ const Home = () => {
                 ref={howItWorksRef}
                 className="w-full px-5 py-24 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#e0f7fa] via-[#b2ebf2] to-[#80deea] relative overflow-hidden"
             >
-                {/* Background Elements */}
                 <div className="absolute top-20 right-10 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 left-10 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div>
 
@@ -183,7 +178,6 @@ const Home = () => {
                         <Leaderboard />
                     </div>
                 </div>
-            {/* <Recommendations /> */}
             </section>
 
             <Recommendations />

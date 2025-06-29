@@ -56,17 +56,14 @@ const Login = () => {
     return (
         <>
             <section className="w-full h-screen flex items-center justify-center relative overflow-hidden lg:pl-[320px]">
-                {/* Background gradient */}
                 <div className="absolute inset-0 bg-gradient-to-br from-[#A2D9FF] via-[#6FD3D3] to-[#00BFA6] opacity-90 z-0"></div>
 
-                {/* Background elements */}
                 <div className="absolute inset-0 overflow-hidden">
                     <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl animate-pulse"></div>
                     <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-[#A2D9FF] opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
                     <div className="absolute top-3/4 left-1/3 w-64 h-64 bg-[#00BFA6] opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
                 </div>
 
-                {/* Login card */}
                 <div
                     className={`relative z-10 mx-auto w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl transform transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 >
@@ -143,7 +140,6 @@ const Login = () => {
                 </div>
             </section>
 
-            {/* Forgot password modal */}
             {showForgotPassword && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -182,7 +178,6 @@ const Login = () => {
 
             )}
 
-            {/* Notification for reset password */}
             {resetMessage && (
                 <div className="fixed bottom-6 left-[58%] transform -translate-x-1/2 bg-white px-6 py-4 rounded-xl shadow-2xl text-center text-gray-700 border-l-4 border-[#00B3B3] flex items-center animate-slideUp z-50 max-w-md">
                     <div className="bg-[#00B3B3]/10 rounded-full p-2 mr-3">

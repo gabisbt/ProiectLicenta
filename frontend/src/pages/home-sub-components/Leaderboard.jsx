@@ -15,7 +15,6 @@ const Leaderboard = () => {
 
     return (
         <section className="my-12 px-4 max-w-5xl mx-auto">
-            {/* Titlu */}
             <div className="mb-8 text-center">
                 <h2 className="text-[#00B3B3] text-3xl font-bold mb-2">
                     Bidders Leaderboard
@@ -25,7 +24,7 @@ const Leaderboard = () => {
                 </p>
             </div>
 
-            {/* Tabelul Leaderboard */}
+        
             <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 mb-6">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -100,7 +99,6 @@ const Leaderboard = () => {
                 </div>
             </div>
 
-            {/* Buton pentru leaderboard complet */}
             <div className="text-center">
                 <Link
                     to="/leaderboard"

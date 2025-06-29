@@ -264,7 +264,6 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             averageScore: scoreDetails.length > 0 ? (scoreDetails.reduce((sum, s) => sum + s.score, 0) / scoreDetails.length) : 0
         });
 
-        // 11. Sorteaza si limiteaza
         const finalRecommendations = recommendations
             .sort((a, b) => b.recommendationScore - a.recommendationScore)
             .slice(0, 20);
@@ -360,7 +359,6 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
             reasons.push(`Some interest in ${auction.category} (${categoryInteractions} times)`);
         }
     } else {
-        // Penalizare pentru categorii necunoscute (mai mica pentru exploratori)
         if (userProfile.userType === 'explorer') {
             score += 5;
             reasons.push(`New category to explore: ${auction.category}`);
@@ -387,7 +385,6 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
     const currentPrice = auction.currentBid || auction.startingBid;
     
     if (userProfile.userType === 'bargain_hunter') {
-        // Pentru vanatorii de chilipiruri
         if (currentPrice <= userProfile.averagePrice * 0.7) {
             score += 30;
             reasons.push(`BARGAIN ALERT! Much cheaper than your usual ${userProfile.averagePrice.toFixed(0)} RON`);
@@ -400,7 +397,6 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
             reasons.push(`Above your usual spending`);
         }
     } else if (userProfile.userType === 'premium_buyer') {
-        // Pentru cumparatorii premium
         if (currentPrice >= userProfile.averagePrice * 0.8 && currentPrice <= userProfile.averagePrice * 1.3) {
             score += 25;
             reasons.push(`Premium quality in your price range`);
@@ -412,7 +408,6 @@ function calculatePersonalizedScore(auction, userProfile, pricePreferences) {
             reasons.push(`Lower price than usual - good value`);
         }
     } else {
-        // Pentru alti utilizatori
         if (currentPrice >= pricePreferences.min && currentPrice <= pricePreferences.max) {
             score += 20;
             reasons.push(`Perfect price match for your budget`);
@@ -472,7 +467,6 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
     const { auctionId } = req.params;
     
     try {
-        // Gaseste licitatia curenta
         const auction = await Auction.findById(auctionId);
         if (!auction) {
             console.log('Auction not found:', auctionId);
@@ -481,7 +475,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
         
         const now = new Date();
         
-        // STEP 1: Verifica toate licitatiile disponibile (pentru debugging)
+        // STEP 1: Verifica toate licitatiile disponibile
         const allAuctions = await Auction.find({
             _id: { $ne: auctionId }
         }).select('title category condition startingBid endTime startTime').lean();
@@ -499,7 +493,6 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             endTime: { $gt: now }
         }).select('title category condition startingBid endTime startTime').lean();
         
-        // console.log(`Active auctions in "${auction.category}":`, activeSameCategoryAuctions.length);
         
         // STEP 4: Strategie multipla pentru a gasi recomandari
         let similarAuctions = [];
@@ -552,8 +545,6 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             .lean();
         }
         
-        // console.log(`Found ${similarAuctions.length} similar auctions using strategy: ${strategy}`);
-        
         if (similarAuctions.length > 0) {
             console.log('Sample similar auctions:');
             similarAuctions.slice(0, 5).forEach((sim, index) => {
@@ -567,7 +558,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             let score = 0;
             const reasons = [];
             
-            // Categoria (cel mai important)
+            // Categoria 
             if (simAuction.category === auction.category) {
                 score += 10;
                 reasons.push('Same category');
@@ -634,7 +625,6 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             })
             .slice(0, 8); // Limiteaza la 8 recomandari
         
-        // console.log('Final similar auctions:', topSimilar.length);
         
         if (topSimilar.length > 0) {
             console.log('Top recommendations:');

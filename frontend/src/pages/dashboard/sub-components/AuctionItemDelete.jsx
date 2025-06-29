@@ -21,7 +21,7 @@ const AuctionItemDelete = () => {
 
   return (
     <>
-      {/* Search Bar */}
+
       <div className="mb-6">
         <div className="relative">
           <input 
@@ -40,7 +40,6 @@ const AuctionItemDelete = () => {
         </p>
       </div>
 
-      {/* Auctions Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">

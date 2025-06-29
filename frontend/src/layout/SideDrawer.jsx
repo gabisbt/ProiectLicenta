@@ -107,23 +107,18 @@ const SideDrawer = () => {
 
     return (
         <>
-            {/* Hamburger Menu Button */}
             <button
                 onClick={() => setShow(!show)}
                 className="fixed right-5 top-5 bg-gradient-to-r from-[#2bd6bf] to-[#00B3B3] text-white text-3xl p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-[101] lg:hidden"
             >
                 {show ? <IoClose /> : <HiMenuAlt3 />}
             </button>
-
-            {/* Sidebar Overlay - Mobile Only */}
             {show && (
                 <div
                     className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[99] lg:hidden"
                     onClick={() => setShow(false)}
                 />
             )}
-
-            {/* Sidebar */}
             <aside
                 className={`w-[100%] sm:w-[320px] fixed top-0 z-[100] h-full
         ${show ? "left-0" : "left-[-100%]"} 
@@ -133,9 +128,9 @@ const SideDrawer = () => {
             >
 
                 <div className="h-full flex flex-col justify-between p-6 overflow-y-auto">
-                    {/* Header and Navigation */}
+          
                     <div>
-                        {/* Logo */}
+                  
                         <Link to="/" className="block mb-8" onClick={() => setShow(false)}>
                             <h4 className="text-3xl font-bold flex items-center">
                                 <span className="bg-gradient-to-r from-[#134e5e] to-[#2bd6bf] text-transparent bg-clip-text">
@@ -146,7 +141,7 @@ const SideDrawer = () => {
                             </h4>
                         </Link>
 
-                        {/* Primary Navigation */}
+                 
                         <nav className="mb-8">
                             <ul className="space-y-2">
                                 {menuItems.map((item, index) => (
@@ -166,7 +161,7 @@ const SideDrawer = () => {
                                                         {item.icon}
                                                     </span>
                                                     <span className="font-medium text-lg">{item.title}</span>
-                                                    {/* Badge pentru favorite */}
+                                               
                                                     {item.path === "/favorites" && item.badge > 0 && (
                                                         <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[20px] flex items-center justify-center">
                                                             {item.badge}
@@ -181,7 +176,6 @@ const SideDrawer = () => {
                             </ul>
                         </nav>
 
-                        {/* Auth Buttons */}
                         {!isAuthenticated ? (
                             <div className="flex flex-col gap-3 my-6">
                                 <Link
@@ -213,7 +207,7 @@ const SideDrawer = () => {
 
                         <div className="h-px bg-gradient-to-r from-transparent via-[#2bd6bf]/30 to-transparent my-6"></div>
 
-                        {/* Secondary Navigation */}
+                    
                         <nav>
                             <ul className="space-y-2">
                                 {secondaryMenuItems.map((item, index) => (
@@ -242,23 +236,9 @@ const SideDrawer = () => {
                             </ul>
                         </nav>
 
-                        {/* Mesaje - pentru Bidder si Auctioneer */}
-                        {/* {user && (user.role === "Bidder" || user.role === "Auctioneer") && (
-                            <div className="mt-4">
-                                <Link
-                                    to="/messages"
-                                    onClick={() => setShow(false)}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-                                        hover:bg-[#f0f9ff] hover:text-[#00B3B3]"
-                                >
-                                    <FaComment className="text-2xl" />
-                                    <span className="font-medium text-lg">Mesaje</span>
-                                </Link>
-                            </div>
-                        )} */}
                     </div>
 
-                    {/* Footer */}
+
                     <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex gap-3 mb-4">
                             <Link
@@ -269,7 +249,6 @@ const SideDrawer = () => {
                                 Contact
                             </Link>
 
-                            {/* Dark Mode Toggle Button */}
                             <button
                                 onClick={toggleTheme}
                                 className="bg-gradient-to-r from-[#2bd6bf]/10 to-[#00B3B3]/10 text-[#00B3B3] dark:text-[#22d3ee] p-3 rounded-full hover:shadow-md transition-all duration-300 flex items-center justify-center"
@@ -290,11 +269,9 @@ const Header = () => {
         <header className="fixed w-full top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg shadow-sm border-b border-gray-200 dark:border-gray-700">
             <div className="container mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center">
-                    {/* Logo și alte elemente */}
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {/* Alte butoane */}
                 </div>
             </div>
         </header>

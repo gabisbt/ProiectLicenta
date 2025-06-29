@@ -59,7 +59,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
     return now >= start && now <= end;
   };
 
-  // Nu afișa nimic dacă utilizatorul nu este autentificat sau nu este Bidder
   if (!isAuthenticated || user?.role !== "Bidder") {
     return null;
   }
@@ -73,7 +72,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
           transition={{ duration: 0.6 }}
           className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50"
         >
-          {/* Header */}
           <div className="flex items-center gap-3 mb-6">
             <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] p-3 rounded-full">
               <FaGavel className="text-white text-xl" />
@@ -104,7 +102,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
                   onClick={() => navigate(`/auction/item/${auction._id}`)}
                 >
                   <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 group-hover:border-[#00B3B3]/30">
-                    {/* Image */}
                     <div className="relative h-32 bg-gray-50 overflow-hidden">
                       {auction.image?.url ? (
                         <img
@@ -118,7 +115,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
                         </div>
                       )}
                       
-                      {/* Status Badge */}
                       <div className="absolute top-2 right-2">
                         {isAuctionActive(auction) ? (
                           <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
@@ -132,7 +128,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
                       </div>
                     </div>
 
-                    {/* Content */}
                     <div className="p-3">
                       <h3 className="font-semibold text-sm text-gray-800 mb-2 truncate">
                         {auction.title}
@@ -163,7 +158,6 @@ const SimilarAuctions = ({ currentAuctionId, currentAuctionCategory }) => {
                         )}
                       </div>
                       
-                      {/* Action Button */}
                       <div className="mt-3 pt-2 border-t border-gray-100">
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-500">

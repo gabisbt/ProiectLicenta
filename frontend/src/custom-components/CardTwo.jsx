@@ -58,7 +58,7 @@ const CardTwo = ({ imgSrc, title, startingBid, startTime, endTime, id, onRepubli
     return (
         <>
             <div className="group bg-white  rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 flex flex-col h-full border border-gray-100 dark:border-gray-700 relative">
-                {/* Imagine licitație cu overlay dacă s-a terminat */}
+                
                 <div className="relative overflow-hidden w-full pt-[75%]">
                     <img
                         src={imgSrc || "/placeholder.png"}
@@ -72,7 +72,7 @@ const CardTwo = ({ imgSrc, title, startingBid, startTime, endTime, id, onRepubli
                     )}
                 </div>
 
-                {/* Conținut card */}
+                
                 <div className="p-4 flex-grow flex flex-col justify-between">
                     <div>
                         <h3 className="font-semibold text-gray-800 dark:text-[#2bd6bf] text-lg mb-2 line-clamp-2 group-hover:text-[#00B3B3] transition-colors duration-300">
@@ -97,7 +97,7 @@ const CardTwo = ({ imgSrc, title, startingBid, startTime, endTime, id, onRepubli
                         )}
                     </div>
 
-                    {/* Butoane pentru acțiuni */}
+                    
                     <div className="mt-4 flex flex-col gap-2">
                         <Link
                             className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white text-center py-2 px-4 rounded-lg font-medium hover:shadow-md transition-all duration-300"
@@ -129,12 +129,11 @@ const CardTwo = ({ imgSrc, title, startingBid, startTime, endTime, id, onRepubli
 export default CardTwo;
 
 const Drawer = ({ setOpenDrawer, openDrawer, id }) => {
-    // Conținutul drawer-ului rămâne neschimbat
     const dispatch = useDispatch();
     const [startTime, setStartTime] = useState(new Date());
     const [endTime, setEndTime] = useState(() => {
         const date = new Date();
-        date.setDate(date.getDate() + 7); // Default to 7 days from now
+        date.setDate(date.getDate() + 7); 
         return date;
     });
     const { loading } = useSelector((state) => state.auction);

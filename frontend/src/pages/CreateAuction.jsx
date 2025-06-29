@@ -64,8 +64,6 @@ const CreateAuction = () => {
 
     const handleCreateAuction = (e) => {
         e.preventDefault();
-        
-        // Afiseaza datele inainte de trimitere pentru debugging
         console.log("Sending data:", {
             title,
             description,
@@ -120,7 +118,6 @@ const CreateAuction = () => {
 
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/50 relative overflow-hidden mb-10">
                     <form className="relative z-10 flex flex-col gap-8 w-full" onSubmit={handleCreateAuction}>
-                        {/* Basic Info Section */}
                         <div>
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">
@@ -194,7 +191,6 @@ const CreateAuction = () => {
                                             min="1"
                                             step="0.01"
                                         />
-                                        {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></span> */}
                                     </div>
                                 </div>
 
@@ -212,7 +208,6 @@ const CreateAuction = () => {
                                             min={startingBid || "0"}
                                             step="0.01"
                                         />
-                                        {/* <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">RON</span> */}
                                     </div>
                                     <p className="text-sm text-gray-500 ml-1">Set a price that allows buyers to purchase the item immediately.</p>
                                 </div>
@@ -221,7 +216,6 @@ const CreateAuction = () => {
                             </div>
                         </div>
 
-                        {/* Description Section */}
                         <div>
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">
@@ -246,7 +240,6 @@ const CreateAuction = () => {
                             </div>
                         </div>
 
-                        {/* Auction Schedule Section */}
                         <div>
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] text-white p-2 rounded-full">

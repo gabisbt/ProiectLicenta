@@ -7,13 +7,12 @@ import { io } from "../server.js";
 import { sendEmail } from "../utils/sendEmail.js"; 
 
 export const placeBid = catchAsyncErrors(async (req, res, next) => {
-    const { id } = req.params; // Extragem id-ul articolului de licitație
+    const { id } = req.params; 
     const auctionItem = await Auction.findById(id);
     if (!auctionItem) {
         return next(new ErrorHandler("Auction Item not found", 404));
     }
 
-    // Verificăm dacă utilizatorul este creatorul licitației
     if (auctionItem.createdBy.toString() === req.user._id.toString()) {
         return next(new ErrorHandler("You cannot place a bid on your own auction.", 403));
     }
@@ -40,9 +39,9 @@ export const placeBid = catchAsyncErrors(async (req, res, next) => {
         if (existingBid && existingBidInAuction) {
             existingBidInAuction.amount = amount;
             existingBid.amount = amount;
-            auctionItem.markModified('bids'); // Marchează array-ul bids ca fiind modificat
-            await auctionItem.save(); // Salvează documentul părinte
-            await existingBid.save(); // Acesta e OK pentru că e document principal
+            auctionItem.markModified('bids'); 
+            await auctionItem.save(); 
+            await existingBid.save(); 
             auctionItem.currentBid = amount;
         } else {
             const bidderDetail = await User.findById(req.user._id);
@@ -65,12 +64,10 @@ export const placeBid = catchAsyncErrors(async (req, res, next) => {
         }
         await auctionItem.save();
 
-        // Sortăm toate ofertele pentru a obține bidders în ordine descrescătoare
         const sortedBids = await Bid.find({ auctionItem: auctionItem._id })
             .sort({ amount: -1 })
             .populate('bidder.id', 'userName profileImage');
 
-        // Emitem eveniment socket.io pentru actualizare în timp real
         io.to(`auction:${id}`).emit("bidUpdate", {
             auctionId: id,
             currentBid: amount,
@@ -245,7 +242,6 @@ RetroShop Team`;
         
         console.log('✅ Buy Now email sent to buyer successfully');
 
-        // Email pentru vânzător
         const sellerSubject = `💰 Item Sold via Buy Now: ${auction.title}`;
         const sellerMessage = `
 Dear ${seller.userName},
@@ -290,7 +286,6 @@ RetroShop Team`;
 
     } catch (emailError) {
         console.error('❌ Error sending Buy Now emails:', emailError);
-        // Nu opri procesul pentru eroarea de email
     }
 
     res.status(200).json({

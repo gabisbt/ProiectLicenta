@@ -23,7 +23,7 @@ const ViewMyAuctions = () => {
   const [republishStartTime, setRepublishStartTime] = useState(new Date());
   const [republishEndTime, setRepublishEndTime] = useState(() => {
     const date = new Date();
-    date.setDate(date.getDate() + 7); // Default to 7 days from now
+    date.setDate(date.getDate() + 7); 
     return date;
   });
 
@@ -74,12 +74,10 @@ const ViewMyAuctions = () => {
 
   const handleRepublishOpen = (id) => {
     setRepublishingId(id);
-    
-    // Set start time to current time
+
     const now = new Date();
     setRepublishStartTime(now);
     
-    // Set end time to 7 days from start time
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + 7);
     setRepublishEndTime(endDate);
@@ -120,7 +118,6 @@ const ViewMyAuctions = () => {
   return (
     <>
       <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden">
-        {/* Background Elements */}
         <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div>
 
@@ -175,7 +172,6 @@ const ViewMyAuctions = () => {
             </div>
           ) : (
             <>
-              {/* Results count */}
               <div className="mb-6">
                 <p className="text-gray-600">
                   You have <span className="font-semibold text-[#00B3B3]">{filteredAuctions.length}</span> {filteredAuctions.length === 1 ? 'auction' : 'auctions'}
@@ -219,18 +215,16 @@ const ViewMyAuctions = () => {
         </div>
       </section>
 
-      {/* Republish Modal with Portal */}
       {isRepublishModalOpen && createPortal(
         <div className="fixed inset-0 flex items-start justify-center z-[1000] p-4 animate-fadeIn pt-32">
-          {/* Semi-transparent backdrop - modificat pentru a fi complet transparent */}
           <div 
             className="fixed inset-0" 
             onClick={handleRepublishClose}
           ></div>
           
-          {/* Modal content */}
+
           <div className="bg-white/95 rounded-2xl shadow-2xl w-full max-w-md p-8 transform transition-all duration-300 border border-white/50 relative overflow-hidden z-10">
-            {/* Decorative background elements */}
+
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-r from-[#00B3B3]/10 to-[#2bd6bf]/10 rounded-full blur-xl"></div>
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gradient-to-r from-[#2bd6bf]/10 to-[#00B3B3]/10 rounded-full blur-xl"></div>
             

@@ -65,11 +65,7 @@ const About = () => {
 
     return (
         <section className="w-full h-auto px-5 pt-24 pb-16 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#e0f7fa] via-[#f0f9f9] to-[#ffffff] relative overflow-hidden">
-            {/* Background Elements */}
-            {/* <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div> */}
-            
-            {/* Titlu principal */}
+
             <motion.div 
                 className="text-center mb-20 relative z-10"
                 initial={{ opacity: 0, y: 20 }}
@@ -87,7 +83,6 @@ const About = () => {
                 </p>
             </motion.div>
 
-            {/* Sectiunea Our Mission */}
             <motion.div 
                 className="mb-20 max-w-6xl mx-auto w-full"
                 variants={containerVariants}
@@ -112,7 +107,6 @@ const About = () => {
                 </motion.div>
             </motion.div>
 
-            {/*Our Values */}
             <motion.div 
                 className="mb-20"
                 variants={containerVariants}
@@ -149,7 +143,6 @@ const About = () => {
                 </div>
             </motion.div>
 
-            {/* Sectiunea Our Story */}
             <motion.div 
                 className="mb-20 max-w-6xl mx-auto w-full"
                 variants={containerVariants}
@@ -182,7 +175,6 @@ const About = () => {
                 </motion.div>
             </motion.div>
 
-            {/* Sectiunea Join Us */}
             <motion.div 
                 className="mb-20 max-w-6xl mx-auto w-full"
                 variants={containerVariants}

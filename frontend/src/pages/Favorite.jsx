@@ -27,8 +27,6 @@ const Favorites = () => {
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
 
-
-  // Redirectionare pentru utilizatori neautentificati
   useEffect(() => {
     if (!isAuthenticated) {
       navigateTo("/login");
@@ -41,28 +39,23 @@ const Favorites = () => {
     }
   }, [isAuthenticated, user, navigateTo]);
 
-  // Detecteaza schimbarea utilizatorului si reseteaza lista de favorite
   useEffect(() => {
-    // Reseteaza starea favorit-urilor cand utilizatorul se schimba
     if (previousUser.current && user && previousUser.current._id !== user._id) {
       console.log("User changed, resetting favorites");
-      dispatch(resetFavorites()); // Actiune pentru a reseta starea favorit-urilor
-      favoritesLoaded.current = false; // Permite reincarcarea favorit-urilor
+      dispatch(resetFavorites()); 
+      favoritesLoaded.current = false; 
     }
     
-    // Salveaza utilizatorul curent pentru comparatii viitoare
     if (user) {
       previousUser.current = user;
     }
     
-    // incarca favorit-urile pentru utilizatorul curent
     if (isAuthenticated && user?.role === "Bidder" && !favoritesLoaded.current) {
       dispatch(getFavorites());
       favoritesLoaded.current = true;
     }
   }, [dispatch, isAuthenticated, user]);
 
-  // Animatie
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoaded(true);
@@ -71,9 +64,7 @@ const Favorites = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filtreaza favoritele in functie de termenul de cautare
   useEffect(() => {
-    // Verificam ca favorites exista si este un array
     if (Array.isArray(favorites)) {
       setFilteredFavorites(
         favorites.filter(item =>
@@ -83,7 +74,6 @@ const Favorites = () => {
     }
   }, [favorites, searchTerm]);
 
-  // Verifica daca o licitatie este activa
   const isAuctionActive = (auction) => {
     try {
       if (!auction?.startTime || !auction?.endTime) return false;
@@ -100,7 +90,6 @@ const Favorites = () => {
     }
   };
 
-  // Handler pentru eliminarea din favorite
   const handleRemoveFromFavorites = (id, title) => {
     if (window.confirm(`Are you sure you want to remove "${title}" from favorites?`)) {
       dispatch(removeFromFavorites(id))
@@ -115,31 +104,24 @@ const Favorites = () => {
     }
   };
 
-  // Add this useEffect to detect system dark mode or let user toggle it
   useEffect(() => {
-    // Check system preference initially
     const darkModeMedia = window.matchMedia('(prefers-color-scheme: dark)');
     setIsDarkMode(darkModeMedia.matches);
     
-    // Listen for changes
     const darkModeHandler = (e) => setIsDarkMode(e.matches);
     darkModeMedia.addEventListener('change', darkModeHandler);
     
-    // Cleanup
     return () => darkModeMedia.removeEventListener('change', darkModeHandler);
   }, []);
   
-  // Add a toggle function you can use with a button if needed
   const toggleDarkMode = () => setIsDarkMode(prev => !prev);
 
-  // Adauga dupa useEffect care incarca favorit-urile:
   useEffect(() => {
     if (favorites && favorites.length > 0) {
         console.log("=== DEBUG FAVORITES ===");
         console.log("Number of favorites:", favorites.length);
         console.log("Favorites data:", favorites);
-        
-        // Verifica duplicatele
+
         const ids = favorites.map(f => f._id);
         const uniqueIds = [...new Set(ids)];
         console.log("Unique IDs:", uniqueIds.length);
@@ -155,7 +137,6 @@ const Favorites = () => {
 
   return (
     <section className="w-full h-auto px-5 pt-20 lg:pl-[320px] flex flex-col min-h-screen bg-gradient-to-b from-[#f0f9f9] to-[#e0f7fa] relative overflow-hidden pb-10">
-      {/* Background Elements */}
       <div className="absolute top-20 right-0 w-72 h-72 bg-[#2bd6bf] opacity-5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-20 left-0 w-96 h-96 bg-[#00B3B3] opacity-5 rounded-full blur-3xl"></div>
 
@@ -170,8 +151,6 @@ const Favorites = () => {
             Your collection of saved auction items that you're interested in.
           </p>
         </div>
-
-        {/* Search Bar */}
         <div className="mb-6">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -193,7 +172,6 @@ const Favorites = () => {
           </div>
         ) : (
           <div>
-            {/* Results count */}
             <div className="mb-6">
               <p className="text-gray-600">
                 You have <span className="font-semibold text-[#00B3B3]">{filteredFavorites.length}</span> favorite {filteredFavorites.length === 1 ? 'auction' : 'auctions'}
@@ -207,7 +185,6 @@ const Favorites = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">  
                 {filteredFavorites.map((auction, index) => (
                   <div key={auction._id || `favorite-${index}`} className="relative">
-                    {/* Butonul de eliminare */}
                     <button
                       onClick={() => handleRemoveFromFavorites(auction._id, auction.title)}
                       className="absolute top-2 right-2 z-10 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors shadow-lg"
@@ -215,8 +192,7 @@ const Favorites = () => {
                     >
                       <FaTrash className="text-sm" />
                     </button>
-                    
-                    {/* Card-ul existent */}
+
                     <Card
                       title={auction.title || "Untitled Auction"}
                       startTime={auction.startTime}
@@ -230,7 +206,6 @@ const Favorites = () => {
                 ))}
               </div>
             ) : (
-              // Componenta pentru "No favorites found" ramane neschimbata
               <div className="flex flex-col items-center justify-center py-20 px-6 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/30 shadow-md">
                 <div className="bg-red-100/50 p-6 rounded-full mb-6">
                   <FaHeart className="text-red-400 text-5xl" />

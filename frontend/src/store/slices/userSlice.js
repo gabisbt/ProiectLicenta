@@ -111,28 +111,6 @@ export const register = (data) => async (dispatch) => {
     }
 };
 
-//pt logare basic
-// export const login = (data) => async (dispatch) => {
-//     dispatch(userSlice.actions.loginRequest());
-//     try {
-//         const response = await axios.post(
-//             "http://localhost:5000/api/v1/user/login",
-//             data,
-//             {
-//                 withCredentials: true,
-//                 headers: { "Content-Type": "application/json" },
-//             }
-//         );
-//         dispatch(userSlice.actions.loginSuccess(response.data));
-//         toast.success(response.data.message);
-//         dispatch(userSlice.actions.clearAllErrors());
-//     } catch (error) {
-//         dispatch(userSlice.actions.loginFailed());
-//         toast.error(error.response.data.message);
-//         dispatch(userSlice.actions.clearAllErrors());
-//     }
-// };
-
 export const login = (data) => async (dispatch) => {
     dispatch(userSlice.actions.loginRequest());
     try {
@@ -160,20 +138,6 @@ export const login = (data) => async (dispatch) => {
     }
   };
 
-//pt logout basic
-// export const logout = () => async (dispatch) => {   
-//     try {
-//         const response = await axios.get("http://localhost:5000/api/v1/user/logout", { withCredentials: true });
-//         dispatch(userSlice.actions.logoutSuccess());
-//         toast.success(response.data.message);
-//         dispatch(userSlice.actions.clearAllErrors());
-//     } catch (error) {
-//         dispatch(userSlice.actions.logoutFailed());
-//         toast.error(error.response.data.message);
-//         dispatch(userSlice.actions.clearAllErrors());       
-//     }
-// };
-
 export const logout = () => async (dispatch) => {   
     try {
       const response = await axios.get("http://localhost:5000/api/v1/user/logout", { withCredentials: true });
@@ -190,20 +154,6 @@ export const logout = () => async (dispatch) => {
       dispatch(userSlice.actions.clearAllErrors());       
     }
   };
-
-//pt a lua userul logat basic
-// export const fetchUser = () => async (dispatch) => {
-//     dispatch(userSlice.actions.fetchUserRequest());
-//     try {
-//         const response = await axios.get("http://localhost:5000/api/v1/user/me", { withCredentials: true });
-//         dispatch(userSlice.actions.fetchUserSuccess(response.data.user));
-//         dispatch(userSlice.actions.clearAllErrors());
-//     } catch (error) {
-//         dispatch(userSlice.actions.fetchUserFailed());
-//         dispatch(userSlice.actions.clearAllErrors());       
-//         console.log(error);
-//     }
-// };
 
 export const fetchUser = () => async (dispatch) => {
     dispatch(userSlice.actions.fetchUserRequest());

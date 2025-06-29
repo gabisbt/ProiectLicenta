@@ -70,7 +70,7 @@ export const addNewAuctionItem = catchAsyncErrors(async (req, res, next) => {
             startingBid,
             startTime,
             endTime,
-            buyNowPrice: buyNowPrice || null, // Adaugă această linie
+            buyNowPrice: buyNowPrice || null, 
             image: {
                 public_id: cloudinaryResponse.public_id,
                 url: cloudinaryResponse.secure_url,
@@ -239,10 +239,8 @@ export const finalizeAuction = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("No bids were placed on this auction", 400));
     }
 
-    // Calculăm comisionul de 5%
     const commission = auction.currentBid * 0.05;
 
-    // Actualizăm comisionul neplătit al vânzătorului
     const seller = await User.findById(auction.createdBy);
     seller.unpaidCommission = (seller.unpaidCommission || 0) + commission;
     await seller.save();
@@ -273,18 +271,15 @@ export const getUnpaidCommission = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getWonAuctions = catchAsyncErrors(async (req, res, next) => {
-    // Verifica daca utilizatorul este logat
     if (!req.user || !req.user._id) {
         return next(new ErrorHandler("User not authenticated", 401));
     }
 
-    // Verificam daca utilizatorul este un Bidder
     if (req.user.role !== "Bidder") {
         return next(new ErrorHandler("Only bidders can access won auctions", 403));
     }
 
     try {
-        // Obtine utilizatorul cu datele despre licitatiile castigate
         const user = await User.findById(req.user._id);
         
         if (!user) {

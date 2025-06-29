@@ -24,7 +24,6 @@ const SellerAuctions = () => {
             console.log('🔍 Fetching auctions for seller:', sellerId);
             console.log('🔍 Active tab:', activeTab);
             
-            // Schimbă logica pentru a trimite parametrul corect
             const statusParam = activeTab === 'all' ? '' : activeTab;
             const url = statusParam 
                 ? `http://localhost:5000/api/v1/auctionitem/seller/${sellerId}?status=${statusParam}`
@@ -50,7 +49,6 @@ const SellerAuctions = () => {
         }
     };
 
-    // Foloseste statisticile primite de la backend
     const activeAuctions = statistics.active;
     const endedAuctions = statistics.ended;
     const totalAuctions = statistics.total;
@@ -85,8 +83,7 @@ const SellerAuctions = () => {
             </section>
         );
     }
-    
-    // Debug temporar
+
     console.log('🔍 Debug info:', {
         activeTab,
         auctionsCount: auctions.length,
@@ -107,10 +104,8 @@ const SellerAuctions = () => {
                     </Link>
                 </div>
 
-                {/* Header cu informatii vanzator */}
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50 mb-8">
                     <div className="flex items-center gap-6 mb-6">
-                        {/* Avatar vanzator */}
                         <div className="w-20 h-20 bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf] rounded-full flex items-center justify-center overflow-hidden">
                             {seller?.profileImage?.url ? (
                                 <img 
@@ -123,7 +118,6 @@ const SellerAuctions = () => {
                             )}
                         </div>
                         
-                        {/* Informatii vanzator */}
                         <div className="flex-1">
                             <h1 className="text-[#134e5e] text-3xl font-bold mb-2">
                                 {seller?.userName || 'Utilizator Necunoscut'}
@@ -141,7 +135,6 @@ const SellerAuctions = () => {
                         </div>
                     </div>
 
-                    {/* Statistici */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
                             <div className="flex items-center gap-4">
@@ -169,7 +162,6 @@ const SellerAuctions = () => {
                     </div>
                 </div>
 
-                {/* Tabs pentru filtrare */}
                 <div className="flex justify-center mb-8">
                     <div className="bg-white/90 backdrop-blur-sm rounded-xl p-2 shadow-lg border border-white/50 inline-flex">
                         <button 
@@ -205,7 +197,6 @@ const SellerAuctions = () => {
                     </div>
                 </div>
 
-                {/* Lista licitațiilor */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {auctions.length > 0 ? (
                         auctions.map((auction) => (

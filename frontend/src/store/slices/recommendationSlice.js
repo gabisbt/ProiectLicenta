@@ -1,9 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000"; // Aceeași bază ca în userSlice.js
+const API_BASE_URL = "http://localhost:5000"; 
 
-// Obține recomandări personalizate
 export const getPersonalizedRecommendations = createAsyncThunk(
   "recommendations/getPersonalized",
   async (_, { rejectWithValue }) => {
@@ -28,7 +27,6 @@ export const getPersonalizedRecommendations = createAsyncThunk(
   }
 );
 
-// Obține licitații similare bazate pe o licitație specifică
 export const getSimilarAuctions = createAsyncThunk(
   "recommendations/getSimilar",
   async (auctionId, { rejectWithValue }) => {
@@ -57,7 +55,7 @@ const recommendationSlice = createSlice({
   name: "recommendation",
   initialState: {
     personalizedRecommendations: [],
-    userProfile: null, // Adaugă aceasta
+    userProfile: null, 
     loading: false,
     error: null,
   },
@@ -69,7 +67,6 @@ const recommendationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Personalized recommendations
       .addCase(getPersonalizedRecommendations.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -87,7 +84,6 @@ const recommendationSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Similar auctions
       .addCase(getSimilarAuctions.pending, (state) => {
         state.loading = true;
       })

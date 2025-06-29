@@ -29,14 +29,12 @@ const PaymentProofs = () => {
     }
   }, [singlePaymentProof]);
 
-  // Filter payments based on search term and status filter
   const filteredProofs = paymentProofs.filter(proof => {
     const matchesSearch = proof.userId?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter ? proof.status === statusFilter : true;
     return matchesSearch && matchesStatus;
   });
 
-  // Get status badge based on payment status
   const getStatusBadge = (status) => {
     switch (status) {
       case "Approved":
@@ -52,7 +50,6 @@ const PaymentProofs = () => {
 
   return (
     <>
-      {/* Search and Filter Section */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row gap-4 mb-4">
           <div className="relative flex-grow">
@@ -101,7 +98,6 @@ const PaymentProofs = () => {
         </div>
       </div>
 
-      {/* Payment Proofs Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -186,7 +182,6 @@ export const Drawer = ({ setOpenDrawer, openDrawer }) => {
   const [amount, setAmount] = useState(singlePaymentProof.amount || "");
   const [status, setStatus] = useState(singlePaymentProof.status || "");
   
-  // Update local state when singlePaymentProof changes
   useEffect(() => {
     if (singlePaymentProof) {
       setAmount(singlePaymentProof.amount || "");
@@ -199,7 +194,6 @@ export const Drawer = ({ setOpenDrawer, openDrawer }) => {
     dispatch(updatePaymentProof(singlePaymentProof._id, status, amount));
   };
   
-  // Close drawer when clicking outside
   const handleOutsideClick = (e) => {
     if (e.target === e.currentTarget) {
       setOpenDrawer(false);

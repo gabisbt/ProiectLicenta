@@ -63,7 +63,6 @@ export const checkFavorite = createAsyncThunk(
   }
 );
 
-// Adaugă acțiunea de reset
 export const resetFavorites = createAsyncThunk(
   "favorites/resetFavorites",
   async (_, { rejectWithValue }) => {
@@ -131,7 +130,6 @@ const favoriteSlice = createSlice({
         state.error = action.payload;
       })
       
-      // Adaugă un handler pentru resetFavorites
       .addCase(resetFavorites.pending, (state) => {
         state.loading = true;
       })

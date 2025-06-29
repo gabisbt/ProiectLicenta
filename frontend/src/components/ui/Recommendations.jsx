@@ -64,7 +64,7 @@ const Recommendations = () => {
             Personalized <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00B3B3] to-[#2bd6bf]">For You</span>
           </h3>
           
-          {/* Afișează profilul utilizatorului */}
+          
           {userProfile && (
             <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-6 inline-block">
               <div className="flex items-center gap-4 text-sm text-[#134e5e]">
