@@ -89,7 +89,7 @@ const Home = () => {
                     <div className="flex flex-col items-center">
                         <span className="text-white/80 text-lg font-medium mb-2">Explore More</span>
                         <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg animate-bounce">
-                            <FaChevronDown className="text-white/80" />
+                            <FaChevronDown className="text-white/80" /> 
                         </div>
                     </div>
                 </div>

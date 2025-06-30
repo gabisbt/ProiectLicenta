@@ -1,5 +1,3 @@
-//modelele Auction, User, Bid pentru interactiunea cu baza de date
-//functiile sendEmail si commissionCalculated pentru trimiterea email + calculare comision
 import cron from "node-cron";
 import { Auction } from "../models/auctionSchema.js";
 import { User } from "../models/userSchema.js";

@@ -61,21 +61,14 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
             if (fav.auction) {
                 const auction = fav.auction;
                 console.log("Processing favorite:", auction.title, auction.category);
-                
-                
                 const category = auction.category || 'unknown';
                 userProfile.categories.set(category, (userProfile.categories.get(category) || 0) + 3);
-                
-                
                 const condition = auction.condition || 'unknown';
                 userProfile.conditions.set(condition, (userProfile.conditions.get(condition) || 0) + 3);
-                
                 
                 if (auction.createdBy) {
                     userProfile.preferredSellers.add(auction.createdBy.toString());
                 }
-                
-                
                 const hour = new Date(fav.createdAt || Date.now()).getHours();
                 userProfile.activityHours.set(hour, (userProfile.activityHours.get(hour) || 0) + 1);
             }
@@ -124,16 +117,12 @@ export const getPersonalizedRecommendations = catchAsyncErrors(async (req, res, 
 
         userProfile.totalInteractions = Array.from(userProfile.categories.values())
             .reduce((sum, count) => sum + count, 0);
-        
         userProfile.diversityScore = userProfile.categories.size;
-        
         userProfile.averagePrice = userProfile.priceRanges.length > 0 
             ? userProfile.priceRanges.reduce((a, b) => a + b, 0) / userProfile.priceRanges.length 
             : 100; 
-        
         userProfile.preferredTimeSlot = Array.from(userProfile.activityHours.entries())
             .sort((a, b) => b[1] - a[1])[0]?.[0] || 12;
-
         userProfile.userType = determineUserType(userProfile);
 
         const activityLevel = determineActivityLevel(userBids.length, user?.wonAuctionsDetails?.length || 0);
@@ -475,26 +464,25 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
         
         const now = new Date();
         
-        // STEP 1: Verifica toate licitatiile disponibile
+        // Pasul 1: Verificarea tuturor licitatiilor disponibile
         const allAuctions = await Auction.find({
             _id: { $ne: auctionId }
         }).select('title category condition startingBid endTime startTime').lean();
         
-        // STEP 2: Licitatii din aceeasi categorie (fara restrictii de timp)
+        // Pasul 2: Licitatii din aceeasi categorie
         const sameCategoryAuctions = await Auction.find({
             _id: { $ne: auctionId },
             category: auction.category
         }).select('title category condition startingBid endTime startTime').lean();
         
-        // STEP 3: Licitatii active din aceeasi categorie
+        // Pasul 3: Licitatii active din aceeasi categorie
         const activeSameCategoryAuctions = await Auction.find({
             _id: { $ne: auctionId },
             category: auction.category,
             endTime: { $gt: now }
         }).select('title category condition startingBid endTime startTime').lean();
         
-        
-        // STEP 4: Strategie multipla pentru a gasi recomandari
+        // Pasul 4: Strategie multipla pentru a gasi recomandari
         let similarAuctions = [];
         let strategy = '';
         
@@ -553,7 +541,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             });
         }
         
-        // STEP 5: Calculeaza scoruri avansate de similaritate
+        // Pas 5: Calculeaza scoruri de similaritate
         const scoredAuctions = similarAuctions.map(simAuction => {
             let score = 0;
             const reasons = [];
@@ -609,7 +597,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
             };
         });
         
-        // STEP 6: Sorteaza si filtreaza rezultatele
+        // Pasul 6: Sorteaza si filtreaza rezultatele
         const topSimilar = scoredAuctions
             .filter(auction => auction.similarityScore > 0) // Doar cu scor pozitiv
             .sort((a, b) => {
@@ -623,7 +611,7 @@ export const getSimilarAuctions = catchAsyncErrors(async (req, res, next) => {
                 // Prioritatea 3: timp ramas (mai putin timp = mai urgent)
                 return a.timeRemaining - b.timeRemaining;
             })
-            .slice(0, 8); // Limiteaza la 8 recomandari
+            .slice(0, 5); 
         
         
         if (topSimilar.length > 0) {
@@ -664,8 +652,6 @@ export const debugAuctions = catchAsyncErrors(async (req, res, next) => {
     try {
         const userId = req.user._id;
         const now = new Date();
-        
-        // Statistici complete
         const totalAuctions = await Auction.countDocuments();
         const myAuctions = await Auction.countDocuments({ createdBy: userId });
         const othersAuctions = await Auction.countDocuments({ createdBy: { $ne: userId } });
@@ -686,7 +672,6 @@ export const debugAuctions = catchAsyncErrors(async (req, res, next) => {
             endTime: { $lte: now }
         });
         
-        // Sample licitatii
         const sampleAll = await Auction.find({ createdBy: { $ne: userId } })
             .select('title category startTime endTime createdBy')
             .limit(10)
@@ -721,7 +706,6 @@ export const debugAuctions = catchAsyncErrors(async (req, res, next) => {
         res.status(500).json({ success: false, error: error.message });
     }
 });
-
 
 function determineUserType(userProfile) {
     const totalInteractions = userProfile.totalInteractions;

@@ -1,6 +1,3 @@
-//Sunt definite rutele pentru gestionarea produselor din licitatii. Aceste rute sunt protejate de middleware-uri de autentificare si autorizare pt a asigura 
-//ca doar utilizatorii autentificati si autorizati pot accesa aceste rute. Rutele sunt definite in functie de metodele controller-ului aferent.
-
 import {addNewAuctionItem, getAllItems, getAuctionDetails, getMyAuctionItems, removeFromAuction, republishItem, getUnpaidCommission, getWonAuctions, getAllAuctionsBySeller} from "../controllers/auctionItemController.js";
 import {isAuthenticated, isAuthorized} from "../middlewares/auth.js";
 import express from "express";

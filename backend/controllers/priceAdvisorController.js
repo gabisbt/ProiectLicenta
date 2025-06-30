@@ -100,7 +100,7 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         Raspunde la intrebarea utilizatorului despre produsul "${productTitle}" in contextul licitatiei.
         Raspunde in limba romana, intr-un stil prietenos dar profesionist.
 
-        CONTEXTUL LICITAtIEI:
+        CONTEXTUL LICITATIEI:
         Utilizatorul se afla pe pagina produsului "${productTitle}" si intreaba: "${query}"
 
         ANALIZA PRODUSULUI:
@@ -109,7 +109,7 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         Conditie: ${condition}
         Pret curent: ${currentBid} RON
 
-        STATISTICI DE PIAtA:
+        STATISTICI DE PIATA:
         - Pret minim observat: ${priceRange.low} RON
         - Pret mediu: ${priceRange.average} RON  
         - Pret median: ${priceRange.median} RON
@@ -128,7 +128,9 @@ export const getPriceAdvice = catchAsyncErrors(async (req, res, next) => {
         3. Recomandarea ta despre suma maxima de platit
         4. Justificarea bazata pe datele de piata
 
-        Raspunde concis in maxim 150 de cuvinte.`;
+        Raspunde concis in maxim 150 de cuvinte.
+        Daca nu ai suficiente informatii, explica ca nu poti oferi o evaluare precisa.
+        `;
         }
         
         try {
